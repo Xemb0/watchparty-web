@@ -300,9 +300,7 @@
     </section>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabase-config.js"></script>
-    <!-- TestFlight signup → writes to the WatchParty app's Supabase project
-         (separate from the website project that supabase-config.js targets).
+    <!-- TestFlight signup → writes to the WatchParty app's Supabase project.
          Insert-only RLS: anyone can submit, nobody can read the list. -->
     <script>
     (function () {
@@ -337,8 +335,48 @@
       });
     })();
     </script>
-    <script src="js/gallery.js"></script>
-    <script>loadGallery('watchparty');</script>
+    <!-- Screenshots: render the NEW images directly from the app's Supabase
+         'marketing' bucket. (The old gallery.js read from the website's
+         separate Supabase project, which still has the old screenshots — so
+         we bypass it here and point straight at the new assets.) -->
+    <script>
+    (function () {
+      var BASE = 'https://kmngufxafbtfvdakcyjn.supabase.co/storage/v1/object/public/marketing/watchparty/';
+      var shots = ['1.png', '2.png', '3.png', '4.png', '5.png'].map(function (f, i) {
+        return { url: BASE + f, alt: 'WatchParty screenshot ' + (i + 1) };
+      });
+      var grid = document.getElementById('gallery-grid');
+      if (!grid) return;
+      grid.className = 'grid grid-cols-2 md:grid-cols-5 gap-4';
+      grid.innerHTML = shots.map(function (s, i) {
+        return '<div class="cursor-pointer group overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1" onclick="wpOpenShot(' + i + ')">'
+          + '<img src="' + s.url + '" alt="' + s.alt + '" class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy"></div>';
+      }).join('');
+
+      // Minimal lightbox
+      var lb = document.createElement('div');
+      lb.style.cssText = 'position:fixed;inset:0;z-index:99998;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.95);padding:24px;';
+      lb.innerHTML = '<button id="wp-lb-close" style="position:absolute;top:16px;right:20px;color:#fff;font-size:40px;background:none;border:0;cursor:pointer;">&times;</button>'
+        + '<button id="wp-lb-prev" style="position:absolute;left:16px;color:#fff;font-size:48px;background:none;border:0;cursor:pointer;">&lsaquo;</button>'
+        + '<img id="wp-lb-img" style="max-height:85vh;max-width:90vw;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.6);">'
+        + '<button id="wp-lb-next" style="position:absolute;right:16px;color:#fff;font-size:48px;background:none;border:0;cursor:pointer;">&rsaquo;</button>';
+      document.body.appendChild(lb);
+      var cur = 0;
+      function show(i) { cur = (i + shots.length) % shots.length; document.getElementById('wp-lb-img').src = shots[cur].url; }
+      window.wpOpenShot = function (i) { show(i); lb.style.display = 'flex'; };
+      function close() { lb.style.display = 'none'; }
+      lb.addEventListener('click', function (e) { if (e.target === lb) close(); });
+      document.getElementById('wp-lb-close').onclick = close;
+      document.getElementById('wp-lb-prev').onclick = function () { show(cur - 1); };
+      document.getElementById('wp-lb-next').onclick = function () { show(cur + 1); };
+      document.addEventListener('keydown', function (e) {
+        if (lb.style.display !== 'flex') return;
+        if (e.key === 'Escape') close();
+        if (e.key === 'ArrowLeft') show(cur - 1);
+        if (e.key === 'ArrowRight') show(cur + 1);
+      });
+    })();
+    </script>
 
     <!-- Footer -->
     <footer class="bg-black/50 backdrop-blur-sm border-t border-gray-800 py-12">
