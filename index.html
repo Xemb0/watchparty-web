@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WatchParty - Watch Movies Together</title>
+    <link rel="icon" type="image/png" href="https://kmngufxafbtfvdakcyjn.supabase.co/storage/v1/object/public/marketing/watchparty/watchparty_logo.png" />
+    <meta property="og:title" content="WatchParty — Watch. Chat. Vibe Together." />
+    <meta property="og:image" content="https://kmngufxafbtfvdakcyjn.supabase.co/storage/v1/object/public/marketing/watchparty/feature_graphic.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       @keyframes float {
@@ -37,11 +40,9 @@
 
       <div class="lg:w-1/2 text-center lg:text-left relative z-10">
         <div class="mb-8">
-          <div class="w-20 h-20 mx-auto lg:mx-0 mb-6 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center glow-effect">
-            <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/>
-            </svg>
-          </div>
+          <img src="https://kmngufxafbtfvdakcyjn.supabase.co/storage/v1/object/public/marketing/watchparty/watchparty_logo.png"
+               alt="WatchParty logo"
+               class="w-24 h-24 mx-auto lg:mx-0 mb-6 rounded-2xl glow-effect object-cover" />
         </div>
         
         <h1 class="text-5xl lg:text-7xl font-bold mb-6 leading-tight">
@@ -58,16 +59,24 @@
           <h3 class="text-lg font-semibold text-purple-300 mb-3">🎬 Currently Available</h3>
           <div class="flex items-center space-x-2 mb-2">
             <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
-            <span class="text-green-400 font-medium">Android App - Live Now!</span>
+            <span class="text-green-400 font-medium">Android App — Live Now!</span>
           </div>
           <div class="space-y-2 text-gray-400 text-sm">
             <div class="flex items-center space-x-2">
-              <span class="w-3 h-3 bg-yellow-500 rounded-full"></span>
-              <span>iOS & Web - Coming Soon</span>
+              <span class="w-3 h-3 bg-green-500 rounded-full"></span>
+              <span>📹 Video &amp; voice calls — watch face-to-face, in sync</span>
             </div>
             <div class="flex items-center space-x-2">
-              <span class="w-3 h-3 bg-blue-500 rounded-full"></span>
-              <span>Desktop Apps - In Development</span>
+              <span class="w-3 h-3 bg-green-500 rounded-full"></span>
+              <span>💬 Live chat, reactions &amp; shared queue</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></span>
+              <span><strong class="text-blue-300">🍎 iOS Beta — now open</strong> (register below for TestFlight)</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="w-3 h-3 bg-green-500 rounded-full"></span>
+              <span>🌐 Web — play right in your browser</span>
             </div>
           </div>
         </div>
@@ -261,6 +270,27 @@
       </div>
     </section>
 
+    <!-- iOS Beta / TestFlight signup -->
+    <section id="ios-beta" class="py-16 px-6">
+      <div class="max-w-2xl mx-auto text-center">
+        <div class="bg-gradient-to-br from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-3xl p-8 backdrop-blur-sm">
+          <div class="text-4xl mb-3">🍎</div>
+          <h2 class="text-3xl font-bold mb-2"><span class="gradient-text">iOS Beta</span> is open</h2>
+          <p class="text-gray-300 mb-6">Want WatchParty on your iPhone? Drop your Apple ID and we'll send you a TestFlight invite. Video calls, live chat &amp; sync — all the latest features.</p>
+          <form id="beta-form" class="flex flex-col sm:flex-row gap-3 justify-center">
+            <input id="beta-apple-id" type="email" required placeholder="Your Apple ID (email)"
+                   class="flex-1 bg-gray-900/70 border border-gray-700 rounded-full px-5 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500" />
+            <button type="submit" id="beta-submit"
+                    class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-3 rounded-full font-bold text-white transform hover:scale-105 transition-all">
+              Request invite
+            </button>
+          </form>
+          <p id="beta-msg" class="text-sm mt-4 min-h-[1.25rem]"></p>
+          <p class="text-xs text-gray-500 mt-2">We only use your Apple ID to send the TestFlight invite. No spam, ever.</p>
+        </div>
+      </div>
+    </section>
+
     <!-- Screenshot Gallery -->
     <section class="py-16 px-6">
       <div class="max-w-7xl mx-auto">
@@ -271,6 +301,42 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
+    <!-- TestFlight signup → writes to the WatchParty app's Supabase project
+         (separate from the website project that supabase-config.js targets).
+         Insert-only RLS: anyone can submit, nobody can read the list. -->
+    <script>
+    (function () {
+      var BETA_URL = 'https://kmngufxafbtfvdakcyjn.supabase.co';
+      var BETA_KEY = 'sb_publishable_SFdhcZPEO9QwWFEwPIu3kw_TjKP3wr4';
+      var betaClient = window.supabase.createClient(BETA_URL, BETA_KEY);
+      var form = document.getElementById('beta-form');
+      var msg = document.getElementById('beta-msg');
+      var btn = document.getElementById('beta-submit');
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        var appleId = document.getElementById('beta-apple-id').value.trim();
+        if (!appleId) return;
+        btn.disabled = true; btn.textContent = 'Sending…';
+        msg.textContent = ''; msg.className = 'text-sm mt-4 min-h-[1.25rem]';
+        var res = await betaClient.from('testflight_signups')
+          .insert({ apple_id: appleId, platform: 'ios', source: 'website' });
+        if (!res.error) {
+          msg.textContent = "✅ You're on the list! Watch your inbox for a TestFlight invite.";
+          msg.className = 'text-sm mt-4 min-h-[1.25rem] text-green-400';
+          form.reset();
+        } else if (res.error.code === '23505') {
+          // unique violation = already signed up
+          msg.textContent = "✅ You're already registered — your invite is on the way.";
+          msg.className = 'text-sm mt-4 min-h-[1.25rem] text-green-400';
+          form.reset();
+        } else {
+          msg.textContent = '⚠️ Something went wrong. Please try again.';
+          msg.className = 'text-sm mt-4 min-h-[1.25rem] text-red-400';
+        }
+        btn.disabled = false; btn.textContent = 'Request invite';
+      });
+    })();
+    </script>
     <script src="js/gallery.js"></script>
     <script>loadGallery('watchparty');</script>
 
