@@ -55,29 +55,57 @@
           Experience movies and shows with friends in perfect sync. Chat, react, and create memories together, no matter where you are.
         </p>
         
-        <div class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-gray-700/50">
-          <h3 class="text-lg font-semibold text-purple-300 mb-3">🎬 Currently Available</h3>
-          <div class="flex items-center space-x-2 mb-2">
-            <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
-            <span class="text-green-400 font-medium">Android App — Live Now!</span>
+        <div class="bg-white/[0.04] backdrop-blur-xl rounded-2xl p-6 mb-8 border border-white/10 shadow-2xl">
+          <div class="flex items-center justify-between mb-5">
+            <h3 class="text-xs font-bold tracking-[0.2em] text-gray-400 uppercase">Available on</h3>
+            <span class="text-[11px] font-semibold text-green-400/90 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span> Live
+            </span>
           </div>
-          <div class="space-y-2 text-gray-400 text-sm">
-            <div class="flex items-center space-x-2">
-              <span class="w-3 h-3 bg-green-500 rounded-full"></span>
-              <span>📹 Video &amp; voice calls — watch face-to-face, in sync</span>
+
+          <!-- Platform badges with real brand logos -->
+          <div class="grid grid-cols-3 gap-3 mb-6">
+            <!-- Android -->
+            <div class="flex flex-col items-center gap-2 rounded-xl py-4 bg-white/[0.03] border border-white/10 hover:border-[#3DDC84]/50 transition-colors">
+              <svg class="w-7 h-7" viewBox="0 0 24 24" fill="#3DDC84"><path d="M17.523 15.341a1.001 1.001 0 1 1 0-2.002 1.001 1.001 0 0 1 0 2.002m-11.046 0a1.001 1.001 0 1 1 0-2.002 1.001 1.001 0 0 1 0 2.002m11.405-6.02 1.997-3.46a.416.416 0 0 0-.152-.567.416.416 0 0 0-.568.152l-2.022 3.503a12.331 12.331 0 0 0-5.137-1.103c-1.84 0-3.583.398-5.138 1.103L4.842 4.946a.416.416 0 0 0-.568-.152.416.416 0 0 0-.152.567l1.997 3.46C2.687 11.07.605 14.32.605 18.073h22.79c0-3.752-2.082-7.003-5.513-8.752"/></svg>
+              <div class="text-center leading-tight">
+                <div class="text-[13px] font-semibold text-white">Android</div>
+                <div class="text-[10px] text-green-400/80 font-medium">Live now</div>
+              </div>
             </div>
-            <div class="flex items-center space-x-2">
-              <span class="w-3 h-3 bg-green-500 rounded-full"></span>
-              <span>💬 Live chat, reactions &amp; shared queue</span>
+            <!-- iOS / Apple -->
+            <div class="flex flex-col items-center gap-2 rounded-xl py-4 bg-white/[0.03] border border-blue-400/30 hover:border-blue-400/60 transition-colors relative overflow-hidden">
+              <span class="absolute top-1.5 right-1.5 text-[8px] font-bold tracking-wider text-blue-300 bg-blue-500/20 px-1.5 py-0.5 rounded">BETA</span>
+              <svg class="w-7 h-7" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg>
+              <div class="text-center leading-tight">
+                <div class="text-[13px] font-semibold text-white">iOS</div>
+                <div class="text-[10px] text-blue-300 font-medium">Beta open</div>
+              </div>
             </div>
-            <div class="flex items-center space-x-2">
-              <span class="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></span>
-              <span><strong class="text-blue-300">🍎 iOS Beta — now open</strong> (register below for TestFlight)</span>
+            <!-- Web -->
+            <div class="flex flex-col items-center gap-2 rounded-xl py-4 bg-white/[0.03] border border-white/10 hover:border-purple-400/50 transition-colors">
+              <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.6"><circle cx="12" cy="12" r="9.5"/><ellipse cx="12" cy="12" rx="4" ry="9.5"/><path d="M2.5 12h19M4 7h16M4 17h16"/></svg>
+              <div class="text-center leading-tight">
+                <div class="text-[13px] font-semibold text-white">Web</div>
+                <div class="text-[10px] text-purple-300/80 font-medium">In browser</div>
+              </div>
             </div>
-            <div class="flex items-center space-x-2">
-              <span class="w-3 h-3 bg-green-500 rounded-full"></span>
-              <span>🌐 Web — play right in your browser</span>
-            </div>
+          </div>
+
+          <!-- Feature pills -->
+          <div class="flex flex-wrap gap-2">
+            <span class="inline-flex items-center gap-1.5 text-xs text-gray-300 bg-white/[0.05] border border-white/10 rounded-full px-3 py-1.5">
+              <svg class="w-3.5 h-3.5 text-purple-300" viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+              Video &amp; voice calls
+            </span>
+            <span class="inline-flex items-center gap-1.5 text-xs text-gray-300 bg-white/[0.05] border border-white/10 rounded-full px-3 py-1.5">
+              <svg class="w-3.5 h-3.5 text-pink-300" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/></svg>
+              Live chat &amp; reactions
+            </span>
+            <span class="inline-flex items-center gap-1.5 text-xs text-gray-300 bg-white/[0.05] border border-white/10 rounded-full px-3 py-1.5">
+              <svg class="w-3.5 h-3.5 text-green-300" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h10v2H4z"/></svg>
+              Shared queue, in sync
+            </span>
           </div>
         </div>
         
