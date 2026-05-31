@@ -1,0 +1,40 @@
+# Netlify config for the standalone WatchParty site.
+# Landing page = / (index.html). The compiled KMP web app = /app/.
+# Translated from the original Apache .htaccess that served the app.
+
+[build]
+  # Static site — nothing to build, just publish the repo root.
+  publish = "."
+
+# ── WASM: serve with the correct MIME so the browser streaming-compiles it
+#    instead of failing with "Incorrect response MIME type" ──
+[[headers]]
+  for = "/app/*.wasm"
+  [headers.values]
+    Content-Type = "application/wasm"
+
+# ── Long-cache the hashed app bundles (filename changes on content change,
+#    so cache-busting is automatic) ──
+[[headers]]
+  for = "/app/*.wasm"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/app/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# ── App entry point must always refresh on redeploy ──
+[[headers]]
+  for = "/app/index.html"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate"
+
+# ── SPA fallback for the Compose client-side router: any deep URL under
+#    /app (e.g. /app/room/ABCD) serves the app's index.html so refresh +
+#    deep links resolve instead of 404. status 200 = rewrite, not redirect. ──
+[[redirects]]
+  from = "/app/*"
+  to = "/app/index.html"
+  status = 200

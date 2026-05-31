@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WatchParty - Watch Movies Together</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+      }
+      .float-animation { animation: float 6s ease-in-out infinite; }
+      .gradient-text {
+        background: linear-gradient(45deg, #8b5cf6, #ec4899, #f59e0b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .glow-effect {
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+      }
+      .movie-grid {
+        background: linear-gradient(45deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1));
+      }
+    </style>
+  </head>
+  <body class="bg-gray-900 text-white overflow-x-hidden">
+    <!-- Hero Section -->
+    <section class="min-h-screen flex flex-col lg:flex-row items-center justify-between px-6 py-16 lg:px-20 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative">
+      <!-- Animated Background Elements -->
+      <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute top-20 left-10 w-32 h-32 bg-purple-500/20 rounded-full blur-xl float-animation"></div>
+        <div class="absolute bottom-20 right-10 w-40 h-40 bg-pink-500/20 rounded-full blur-xl float-animation" style="animation-delay: -2s;"></div>
+        <div class="absolute top-1/2 left-1/3 w-24 h-24 bg-blue-500/20 rounded-full blur-xl float-animation" style="animation-delay: -4s;"></div>
+      </div>
+
+      <div class="lg:w-1/2 text-center lg:text-left relative z-10">
+        <div class="mb-8">
+          <div class="w-20 h-20 mx-auto lg:mx-0 mb-6 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center glow-effect">
+            <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/>
+            </svg>
+          </div>
+        </div>
+        
+        <h1 class="text-5xl lg:text-7xl font-bold mb-6 leading-tight">
+          <span class="gradient-text">Watch</span>
+          <br />
+          <span class="text-white">Together</span>
+        </h1>
+        
+        <p class="text-xl lg:text-2xl text-gray-300 mb-8 leading-relaxed">
+          Experience movies and shows with friends in perfect sync. Chat, react, and create memories together, no matter where you are.
+        </p>
+        
+        <div class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-gray-700/50">
+          <h3 class="text-lg font-semibold text-purple-300 mb-3">🎬 Currently Available</h3>
+          <div class="flex items-center space-x-2 mb-2">
+            <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+            <span class="text-green-400 font-medium">Android App - Live Now!</span>
+          </div>
+          <div class="space-y-2 text-gray-400 text-sm">
+            <div class="flex items-center space-x-2">
+              <span class="w-3 h-3 bg-yellow-500 rounded-full"></span>
+              <span>iOS & Web - Coming Soon</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="w-3 h-3 bg-blue-500 rounded-full"></span>
+              <span>Desktop Apps - In Development</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex flex-wrap gap-4 justify-center lg:justify-start">
+          <a href="files/watchparty.apk" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-8 py-4 rounded-full font-bold text-white transform hover:scale-105 transition-all duration-300 glow-effect" download>
+            📱 Download Android APK
+          </a>
+          <a href="https://play.google.com/store/apps/details?id=com.autotech.watchparty" class="bg-gray-800 hover:bg-gray-700 px-8 py-4 rounded-full font-bold text-white border border-gray-600 transform hover:scale-105 transition-all duration-300">
+            📦 Google Play Store
+          </a>
+        </div>
+        
+        <div class="mt-8 text-center lg:text-left">
+          <p class="text-gray-400 text-sm">🚀 Join over 10,000+ users watching together!</p>
+          <p class="text-gray-500 text-xs mt-3">
+            By installing or signing in to WatchParty you agree to our
+            <a href="terms-of-service.html" class="text-purple-400 hover:text-purple-300 underline underline-offset-2">Terms of Service</a>
+            and
+            <a href="privacy-policy.html" class="text-purple-400 hover:text-purple-300 underline underline-offset-2">Privacy Policy</a>.
+          </p>
+        </div>
+      </div>
+      
+      <div class="lg:w-1/2 mt-16 lg:mt-0 flex justify-center relative z-10">
+        <div class="relative">
+          <div class="absolute inset-0 bg-gradient-to-r from-purple-500/30 to-pink-500/30 blur-3xl rounded-full"></div>
+          <div class="relative bg-gray-800 rounded-3xl p-8 shadow-2xl border border-gray-700/50 backdrop-blur-sm movie-grid">
+            <div class="text-center mb-6">
+              <h3 class="text-2xl font-bold mb-2">Now Watching</h3>
+              <p class="text-gray-400">Avatar: The Way of Water</p>
+            </div>
+            
+            <!-- Mock Video Player -->
+            <div class="bg-black rounded-xl mb-6 relative overflow-hidden">
+              <div class="aspect-video bg-gradient-to-br from-blue-900 to-purple-900 flex items-center justify-center">
+                <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                  <svg class="w-8 h-8 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </div>
+              </div>
+              <!-- Progress Bar -->
+              <div class="absolute bottom-0 left-0 right-0 bg-gray-900/80 p-3">
+                <div class="flex items-center space-x-2 text-xs">
+                  <span>1:23:45</span>
+                  <div class="flex-1 bg-gray-700 rounded-full h-1">
+                    <div class="bg-purple-500 h-1 rounded-full" style="width: 65%"></div>
+                  </div>
+                  <span>2:15:30</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Mock Chat -->
+            <div class="space-y-3">
+              <div class="flex items-start space-x-2">
+                <div class="w-6 h-6 bg-purple-500 rounded-full text-xs flex items-center justify-center">A</div>
+                <div class="bg-gray-700 rounded-lg px-3 py-1 text-sm">This scene is incredible! 🤩</div>
+              </div>
+              <div class="flex items-start space-x-2">
+                <div class="w-6 h-6 bg-pink-500 rounded-full text-xs flex items-center justify-center">M</div>
+                <div class="bg-gray-700 rounded-lg px-3 py-1 text-sm">The visuals are stunning ✨</div>
+              </div>
+              <div class="flex items-start space-x-2">
+                <div class="w-6 h-6 bg-blue-500 rounded-full text-xs flex items-center justify-center">J</div>
+                <div class="bg-gray-700 rounded-lg px-3 py-1 text-sm typing-indicator">
+                  <span class="inline-block w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
+                  <span class="inline-block w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></span>
+                  <span class="inline-block w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="max-w-7xl mx-auto px-6 py-20">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl lg:text-5xl font-bold mb-6">
+          <span class="gradient-text">Why Choose</span> WatchParty?
+        </h2>
+        <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+          The ultimate social movie experience with cutting-edge sync technology and seamless connectivity
+        </p>
+      </div>
+      
+      <div class="grid lg:grid-cols-3 gap-8">
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl shadow-2xl border border-gray-700/50 hover:border-purple-500/50 transition-all duration-300 group">
+          <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold mb-4 text-white">Perfect Sync</h3>
+          <p class="text-gray-400 leading-relaxed">
+            Our advanced synchronization technology ensures everyone watches at exactly the same moment, with automatic pause/play coordination.
+          </p>
+        </div>
+        
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl shadow-2xl border border-gray-700/50 hover:border-pink-500/50 transition-all duration-300 group">
+          <div class="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold mb-4 text-white">Real-time Chat</h3>
+          <p class="text-gray-400 leading-relaxed">
+            Share reactions, jokes, and commentary with built-in chat. Express yourself with emojis, reactions, and custom stickers.
+          </p>
+        </div>
+        
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl shadow-2xl border border-gray-700/50 hover:border-green-500/50 transition-all duration-300 group">
+          <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold mb-4 text-white">Easy Setup</h3>
+          <p class="text-gray-400 leading-relaxed">
+            Create or join watch parties instantly with simple room codes. No complex setup required - just share the link and start watching.
+          </p>
+        </div>
+        
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl shadow-2xl border border-gray-700/50 hover:border-orange-500/50 transition-all duration-300 group">
+          <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2.5-5H17V4.5C17 3.12 15.88 2 14.5 2h-5C8.12 2 7 3.12 7 4.5V6H4.5C3.67 6 3 6.67 3 7.5S3.67 9 4.5 9H6v9c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V9h1.5C20.33 9 21 8.33 21 7.5S20.33 6 19.5 6zM9 4.5c0-.28.22-.5.5-.5h5c.28 0 .5.22.5.5V6H9V4.5z"/>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold mb-4 text-white">Multiple Platforms</h3>
+          <p class="text-gray-400 leading-relaxed">
+            Starting with Android, expanding to iOS, web browsers, and desktop apps. Watch together across all your favorite devices.
+          </p>
+        </div>
+        
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl shadow-2xl border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300 group">
+          <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold mb-4 text-white">Private & Secure</h3>
+          <p class="text-gray-400 leading-relaxed">
+            Your watch parties are private by default. End-to-end encrypted connections ensure your viewing experience stays between friends.
+          </p>
+        </div>
+        
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl shadow-2xl border border-gray-700/50 hover:border-yellow-500/50 transition-all duration-300 group">
+          <div class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2l2.09 6.26L20 9.27l-5 4.87 1.18 6.88L12 17.77l-4.18 3.25L9 14.14 4 9.27l5.91-1.01L12 2z"/>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold mb-4 text-white">HD Quality</h3>
+          <p class="text-gray-400 leading-relaxed">
+            Stream in crystal-clear HD quality with adaptive bitrate streaming. Optimized for smooth playback on any connection speed.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Coming Soon Section -->
+    <section class="max-w-6xl mx-auto px-6 py-16">
+      <div class="bg-gradient-to-r from-purple-900/50 to-pink-900/50 rounded-3xl p-12 text-center border border-purple-500/20">
+        <h2 class="text-3xl lg:text-4xl font-bold mb-6">🚀 Exciting Updates Coming Soon</h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+          <div class="bg-gray-800/50 rounded-xl p-4 backdrop-blur-sm">
+            <div class="text-2xl mb-2">📱</div>
+            <h4 class="font-semibold text-purple-300">iOS App</h4>
+            <p class="text-sm text-gray-400 mt-1">iPhone & iPad support</p>
+          </div>
+          <a href="/app/" class="bg-gradient-to-br from-blue-600/40 to-purple-600/40 rounded-xl p-4 backdrop-blur-sm block hover:from-blue-600/60 hover:to-purple-600/60 transition-all transform hover:scale-105 border border-blue-500/40">
+            <div class="text-2xl mb-2">🌐</div>
+            <h4 class="font-semibold text-blue-300">Launch Web App →</h4>
+            <p class="text-sm text-gray-300 mt-1">Watch right in your browser</p>
+          </a>
+          <div class="bg-gray-800/50 rounded-xl p-4 backdrop-blur-sm">
+            <div class="text-2xl mb-2">💻</div>
+            <h4 class="font-semibold text-green-300">Desktop Apps</h4>
+            <p class="text-sm text-gray-400 mt-1">Windows & macOS</p>
+          </div>
+          <div class="bg-gray-800/50 rounded-xl p-4 backdrop-blur-sm">
+            <div class="text-2xl mb-2">🎬</div>
+            <h4 class="font-semibold text-pink-300">More Features</h4>
+            <p class="text-sm text-gray-400 mt-1">Voice chat & more</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Screenshot Gallery -->
+    <section class="py-16 px-6">
+      <div class="max-w-7xl mx-auto">
+        <h2 class="text-3xl font-bold text-center mb-8 gradient-text">Screenshots</h2>
+        <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+      </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/gallery.js"></script>
+    <script>loadGallery('watchparty');</script>
+
+    <!-- Footer -->
+    <footer class="bg-black/50 backdrop-blur-sm border-t border-gray-800 py-12">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center">
+          <div class="flex justify-center items-center space-x-3 mb-6">
+            <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/>
+              </svg>
+            </div>
+            <span class="text-2xl font-bold gradient-text">WatchParty</span>
+          </div>
+          
+          <p class="text-gray-400 mb-6">© 2025 WatchParty by Imautotech - Bringing people together through shared experiences</p>
+          
+          <div class="flex flex-wrap justify-center gap-6 text-sm">
+            <a href="privacy-policy.html" class="text-purple-400 hover:text-purple-300 transition-colors">Privacy Policy</a>
+            <a href="terms-of-service.html" class="text-purple-400 hover:text-purple-300 transition-colors">Terms of Service</a>
+            <a href="contact.html" class="text-purple-400 hover:text-purple-300 transition-colors">Contact Us</a>
+            <a href="https://imautotech.in/support/?product=watchparty" class="text-purple-400 hover:text-purple-300 transition-colors">Help Center</a>
+            <a href="https://imautotech.in/support/delete.html?product=watchparty" class="text-purple-400 hover:text-purple-300 transition-colors">Delete Account</a>
+            <a href="https://imautotech.in/" class="text-pink-400 hover:text-pink-300 transition-colors">Need an App Built?</a>
+          </div>
+          
+          <div class="mt-8 pt-6 border-t border-gray-800">
+            <p class="text-gray-500 text-sm">Made with ❤️ for movie lovers everywhere</p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Add some interactive animations
+      document.addEventListener('DOMContentLoaded', function() {
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+          anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+              target.scrollIntoView({ behavior: 'smooth' });
+            }
+          });
+        });
+        
+        // Add parallax effect to hero background elements
+        window.addEventListener('scroll', () => {
+          const scrolled = window.pageYOffset;
+          const parallaxElements = document.querySelectorAll('.float-animation');
+          parallaxElements.forEach(el => {
+            const speed = 0.1;
+            el.style.transform = `translateY(${scrolled * speed}px)`;
+          });
+        });
+      });
+    </script>
+
+<script>
+(function () {
+  // Invite landing. We do NOT auto-redirect to intent:// on load — Android
+  // Chrome blocks external-scheme navigations without a user gesture and shows
+  // "no page found". Instead, when ?roomId= is present we show a focused
+  // tap-to-open overlay. (When the app is installed and App Links are verified,
+  // Android opens the app directly and this page is never seen.)
+  function getRoomId() {
+    return (new URLSearchParams(window.location.search).get('roomId') || '').trim();
+  }
+  var PLAY_URL = 'https://play.google.com/store/apps/details?id=com.autotech.watchparty';
+  function buildIntent(roomId) {
+    return 'intent://imautotech.in/our_products/watch_party/watchparty?roomId='
+      + encodeURIComponent(roomId)
+      + '#Intent;scheme=https;package=com.autotech.watchparty;S.browser_fallback_url='
+      + encodeURIComponent(PLAY_URL) + ';end';
+  }
+  window.openApp = function () {
+    var r = getRoomId();
+    window.location.href = r ? buildIntent(r) : PLAY_URL;
+  };
+  window.addEventListener('load', function () {
+    var roomId = getRoomId();
+    if (!roomId) return; // plain marketing page when there is no invite
+    var isAndroid = /Android/i.test(navigator.userAgent);
+    var safeRoom = roomId.replace(/[^A-Za-z0-9_-]/g, '');
+    var ov = document.createElement('div');
+    ov.id = 'wp-invite-overlay';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(120% 120% at 50% 0%,#1e1b4b 0%,#0b0b14 70%);';
+    ov.innerHTML =
+      '<div style="max-width:380px;width:100%;text-align:center;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;">'
+      + '<div style="font-size:13px;letter-spacing:.18em;color:#a78bfa;font-weight:700;">INVITED TO A WATCH PARTY</div>'
+      + '<h1 style="font-size:26px;font-weight:800;margin:10px 0 4px;">Join the room</h1>'
+      + '<p style="color:#cbd5e1;font-size:14px;margin:0 0 18px;">Watch movies and videos together, in sync.</p>'
+      + '<div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:8px 16px;margin-bottom:22px;">'
+      + '<span style="color:#94a3b8;font-size:12px;">ROOM</span>'
+      + '<span style="font-weight:800;letter-spacing:.12em;font-size:16px;">' + safeRoom + '</span>'
+      + '</div>'
+      + '<a id="wp-open-btn" href="#" style="display:block;background:linear-gradient(90deg,#2563eb,#06b6d4);color:#fff;font-weight:700;font-size:16px;text-decoration:none;padding:15px;border-radius:14px;margin-bottom:12px;">Open in WatchParty</a>'
+      + '<a href="' + PLAY_URL + '" style="display:block;color:#cbd5e1;font-size:13px;text-decoration:none;">No app yet? Get it on Google Play</a>'
+      + '</div>';
+    document.body.appendChild(ov);
+    document.body.style.overflow = 'hidden';
+    document.getElementById('wp-open-btn').addEventListener('click', function (e) {
+      e.preventDefault();
+      window.location.href = isAndroid ? buildIntent(roomId) : PLAY_URL;
+    });
+  });
+})();
+</script>
+  </body>
+</html>

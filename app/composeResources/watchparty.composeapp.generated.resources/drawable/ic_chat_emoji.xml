@@ -1,0 +1,77 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="510dp"
+    android:height="510dp"
+    android:viewportWidth="510"
+    android:viewportHeight="510">
+    <!-- Chat bubble base (pink) -->
+    <path
+        android:pathData="M234,207H54c-24.301,0 -44,19.699 -44,44v156c0,24.301 19.699,44 44,44v49l49.444,-49H234c24.301,0 44,-19.699 44,-44V251c0,-24.301 -19.699,-44 -44,-44z"
+        android:fillColor="#fd7da0"/>
+    <!-- Chat bubble darker overlay -->
+    <path
+        android:pathData="M234,207H99.996c8.996,50.183 33.003,96.38 69.813,133.191 30.608,30.608 67.709,52.355 108.191,63.993V251c0,-24.301 -19.699,-44 -44,-44z"
+        android:fillColor="#db4b86"/>
+    <!-- White ribbon shape inside chat bubble -->
+    <path
+        android:pathData="M123.624,276.946c-10.762,-1.503 -22.075,1.884 -30.35,10.159 -14.008,14.008 -14.008,36.718 0,50.726l38.508,38.508c6.748,6.748 17.688,6.748 24.436,0l25.22,-25.22 -57.814,-74.173z"
+        android:fillColor="#ffffff"/>
+    <!-- Light blue overlay on ribbon -->
+    <path
+        android:pathData="M194.726,287.106c-14.008,-14.008 -36.718,-14.008 -50.726,0a35.708,35.708 0,0 0,-20.376 -10.156c11.84,23.058 27.328,44.383 46.185,63.241a256.957,256.957 0,0 0,11.629 10.928l13.288,-13.288c14.007,-14.007 14.007,-36.718 0,-50.725z"
+        android:fillColor="#d2dcfd"/>
+    <!-- Smiley head white background -->
+    <path
+        android:pathData="M500,162c0,-83.947 -68.053,-152 -152,-152S196,78.053 196,162s68.053,152 152,152c20.951,0 40.912,-4.24 59.073,-11.907L450,344.635v-69.943c30.708,-27.812 50,-67.998 50,-112.692z"
+        android:fillColor="#ffffff"/>
+    <!-- Smiley head shadow side (light blue) -->
+    <path
+        android:pathData="M348,162c0,-54.584 20.64,-104.343 54.533,-141.914C385.604,13.577 367.221,10 348,10c-83.947,0 -152,68.053 -152,152s68.053,152 152,152c19.221,0 37.604,-3.578 54.532,-10.087C368.639,266.342 348,216.583 348,162z"
+        android:fillColor="#d2dcfd"/>
+    <!-- Smiley face (yellow) -->
+    <path
+        android:pathData="M372.518,261.034C417.009,250.056 450,209.881 450,162s-32.991,-88.056 -77.482,-99.034l-38.164,43.189 -11.826,123.886 49.99,30.993z"
+        android:fillColor="#fdcb50"/>
+    <!-- Smiley face shadow side (orange) -->
+    <path
+        android:pathData="M372.517,261.027C356.866,231.472 348,197.772 348,162s8.866,-69.471 24.517,-99.027A102.225,102.225 0,0 0,348 60c-56.333,0 -102,45.667 -102,102s45.667,102 102,102c8.453,0 16.662,-1.035 24.517,-2.973z"
+        android:fillColor="#fd8f01"/>
+    <!-- Chat bubble outline -->
+    <path
+        android:pathData="M202.774,207H54c-24.301,0 -44,19.699 -44,44v156c0,24.301 19.699,44 44,44v49l49.444,-49H234c24.301,0 44,-19.699 44,-44V296.948"
+        android:strokeColor="#052a75"
+        android:strokeWidth="20"
+        android:strokeLineJoin="round"
+        android:strokeMiterLimit="10"/>
+    <!-- Left eyebrow -->
+    <path
+        android:pathData="M325.306,140.815c-8.146,-8.146 -21.354,-8.146 -29.5,0"
+        android:strokeColor="#052a75"
+        android:strokeWidth="20"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeMiterLimit="10"/>
+    <!-- Right eyebrow -->
+    <path
+        android:pathData="M370.694,140.815c8.146,-8.146 21.354,-8.146 29.5,0"
+        android:strokeColor="#052a75"
+        android:strokeWidth="20"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeMiterLimit="10"/>
+    <!-- Smile mouth -->
+    <path
+        android:pathData="M311.223,184.939c4.049,16.552 18.977,28.835 36.777,28.835s32.727,-12.283 36.777,-28.835"
+        android:strokeColor="#db4b86"
+        android:strokeWidth="20"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeMiterLimit="10"/>
+    <!-- Smiley head outline -->
+    <path
+        android:pathData="M500,162c0,-83.947 -68.053,-152 -152,-152S196,78.053 196,162s68.053,152 152,152c20.951,0 40.912,-4.24 59.073,-11.907L450,344.635v-69.943c30.708,-27.812 50,-67.998 50,-112.692z"
+        android:strokeColor="#052a75"
+        android:strokeWidth="20"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeMiterLimit="10"/>
+</vector>

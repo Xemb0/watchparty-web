@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WatchParty</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #1a1a2e;
+        }
+        #composeTarget {
+            width: 100%;
+            height: 100%;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        /* Ensure media player iframes/videos appear above the Compose canvas.
+           Do NOT force position: relative — the chaintech library uses position: absolute
+           within a container div to constrain the iframe to the Compose layout bounds.
+           Forcing relative breaks that containment and makes the iframe full-viewport. */
+        iframe[src*="youtube"],
+        iframe[src*="youtu.be"],
+        iframe[src*="youtube-nocookie"] {
+            z-index: 10 !important;
+        }
+        #composeTarget video,
+        #composeTarget iframe {
+            z-index: 10 !important;
+        }
+        /* WebRTC video elements are appended to document.body by VideoTrackPlayer */
+        body > video {
+            z-index: 10 !important;
+        }
+        /* Auth overlay — real HTML buttons so clicks always work */
+        #authOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1000;
+            background: radial-gradient(circle at center, #1A237E 0%, #000000 50%, #1E1B4B 100%);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        #authOverlay.visible { display: flex; }
+        #authOverlay .logo-box {
+            width: 120px; height: 120px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 24px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 24px;
+        }
+        #authOverlay .logo-box img { width: 80px; height: 80px; }
+        #authOverlay h1 {
+            color: white; font-size: 32px; font-weight: 700;
+            margin: 0 0 12px; text-align: center;
+        }
+        #authOverlay p {
+            color: rgba(255,255,255,0.8); font-size: 14px;
+            text-align: center; line-height: 22px;
+            margin: 0 0 48px; max-width: 360px;
+        }
+        #authOverlay .btn-container {
+            width: 100%; max-width: 360px;
+            display: flex; flex-direction: column; gap: 16px;
+            padding: 0 32px; box-sizing: border-box;
+        }
+        #authOverlay .btn-google {
+            width: 100%; height: 56px; border: none; border-radius: 16px;
+            background: linear-gradient(90deg, #9333EA, #EC4899);
+            color: white; font-size: 16px; font-weight: 600;
+            cursor: pointer; transition: opacity 0.2s;
+        }
+        #authOverlay .btn-google:hover { opacity: 0.9; }
+        #authOverlay .btn-guest {
+            width: 100%; height: 56px; border-radius: 16px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white; font-size: 16px; font-weight: 500;
+            cursor: pointer; transition: opacity 0.2s;
+        }
+        #authOverlay .btn-guest:hover { opacity: 0.8; }
+        #authOverlay .version {
+            color: rgba(255,255,255,0.4); font-size: 12px;
+            margin-top: 48px;
+        }
+
+    </style>
+    <script>
+        // Compose Multiplatform wasmJs clipboard paste fix.
+        // Compose canvas does not receive native paste events, so we intercept
+        // them and re-dispatch as synthetic keyboard input that Compose handles.
+        document.addEventListener('paste', function(e) {
+            var text = (e.clipboardData || window.clipboardData).getData('text');
+            if (!text) return;
+            var target = document.activeElement;
+            if (!target) return;
+
+            // Try the InputEvent API first (Compose 1.6+ handles beforeinput)
+            try {
+                var inputEvent = new InputEvent('beforeinput', {
+                    inputType: 'insertFromPaste',
+                    data: text,
+                    bubbles: true,
+                    cancelable: true,
+                    composed: true
+                });
+                var handled = !target.dispatchEvent(inputEvent);
+                if (handled) { e.preventDefault(); return; }
+            } catch(_) {}
+
+            // Fallback: send each character as a keydown/keyup pair
+            for (var i = 0; i < text.length; i++) {
+                var ch = text[i];
+                target.dispatchEvent(new KeyboardEvent('keydown', {
+                    key: ch, code: 'Key' + ch.toUpperCase(),
+                    bubbles: true, cancelable: true, composed: true
+                }));
+                target.dispatchEvent(new KeyboardEvent('keyup', {
+                    key: ch, code: 'Key' + ch.toUpperCase(),
+                    bubbles: true, cancelable: true, composed: true
+                }));
+            }
+            e.preventDefault();
+        });
+    </script>
+</head>
+<body>
+<div id="composeTarget"></div>
+
+<!-- Auth overlay with real HTML buttons (bypasses Compose canvas click issues) -->
+<div id="authOverlay">
+    <div class="logo-box">
+        <span style="font-size: 56px;">🎬</span>
+    </div>
+    <h1>WatchTogether</h1>
+    <p>Create unforgettable movie nights with friends,<br>no matter where you are.</p>
+    <div class="btn-container">
+        <button class="btn-google" id="btnGoogleSignIn">G&nbsp;&nbsp;&nbsp;Sign in with Google</button>
+        <button class="btn-guest" id="btnGuest">👤&nbsp;&nbsp;Continue as Guest</button>
+    </div>
+    <span class="version">v1.2</span>
+</div>
+
+
+<div id="loading" style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: system-ui; background: #121212; color: #fff; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999;">
+    <div style="text-align: center;">
+        <div style="width: 48px; height: 48px; border: 4px solid #333; border-top: 4px solid #6200ee; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px;"></div>
+        <p>Loading WatchParty...</p>
+    </div>
+</div>
+<style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+
+<div id="unsupported-browser" style="display: none; text-align: center; padding: 40px; font-family: system-ui; background: #121212; color: #fff; height: 100vh; position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; box-sizing: border-box; overflow: auto;">
+    <h2>WatchParty couldn't start</h2>
+    <p id="wp-fail-reason" style="color:#f87171; max-width: 800px; margin: 12px auto; font-family: ui-monospace, monospace; font-size: 13px; white-space: pre-wrap; text-align: left;"></p>
+    <p style="opacity: 0.7; max-width: 600px; margin: 16px auto;">If this looks like a "WebAssembly GC" error, you need Chrome 119+, Firefox 120+, Edge 119+, or Safari 18.4+. Otherwise paste the message above when reporting.</p>
+    <button onclick="location.reload()" style="margin-top: 16px; background: #6200ee; color: #fff; border: 0; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Retry</button>
+</div>
+
+<script>
+    // Capture the FIRST JS / wasm error so the fallback screen can show
+    // something actionable. The 30-second timeout used to flash an
+    // "unsupported browser" message even when the actual problem was a
+    // bug in our own code — completely opaque to anyone debugging.
+    window.__wp_first_error = null;
+    window.addEventListener('error', function(e) {
+        if (!window.__wp_first_error) {
+            window.__wp_first_error = (e.error && (e.error.stack || e.error.message)) || e.message || String(e);
+        }
+        console.error('[WP] window.error:', e);
+    });
+    window.addEventListener('unhandledrejection', function(e) {
+        if (!window.__wp_first_error) {
+            window.__wp_first_error = (e.reason && (e.reason.stack || e.reason.message)) || String(e.reason);
+        }
+        console.error('[WP] unhandledrejection:', e.reason);
+    });
+
+    window.__wp_wasm_loaded = false;
+    // 60 s — first-visit wasm download + compile on a slow mobile network
+    // can legitimately need close to a minute. The previous 30 s window
+    // was firing on real cold loads.
+    setTimeout(function() {
+        if (!window.__wp_wasm_loaded) {
+            var loading = document.getElementById('loading');
+            if (loading) loading.style.display = 'none';
+            var unsupported = document.getElementById('unsupported-browser');
+            var reason = document.getElementById('wp-fail-reason');
+            if (reason) {
+                if (window.__wp_first_error) {
+                    reason.textContent = String(window.__wp_first_error);
+                } else if (typeof WebAssembly === 'undefined') {
+                    reason.textContent = 'WebAssembly is not available in this browser.';
+                } else {
+                    reason.textContent = 'No error logged, but the wasm module never reported as loaded within 60 s. Check the browser console for blocked requests or a CSP error.';
+                }
+            }
+            if (unsupported) unsupported.style.display = 'flex';
+            var compose = document.getElementById('composeTarget');
+            if (compose) compose.style.display = 'none';
+        }
+    }, 60000);
+</script>
+
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+    import { getAnalytics, logEvent, setUserId } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js';
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDxHtbfVY0Tudx9TkSRPT5J-xBtphCTtsc",
+        authDomain: "watchparty-1316f.firebaseapp.com",
+        projectId: "watchparty-1316f",
+        storageBucket: "watchparty-1316f.firebasestorage.app",
+        messagingSenderId: "423168474803",
+        appId: "1:423168474803:web:6ef32757f371aa65e57ac6",
+        measurementId: "G-VCECV99QF4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    window.__wp_firebase_app = app;
+
+    try {
+        const analytics = getAnalytics(app);
+        window.__wp_logEvent = (name, paramsJson) => {
+            try {
+                const params = paramsJson ? JSON.parse(paramsJson) : {};
+                logEvent(analytics, name, params);
+            } catch(e) { console.warn('[WP-Analytics] logEvent failed:', e); }
+        };
+        window.__wp_setUserId = (id) => setUserId(analytics, id);
+    } catch(e) {
+        console.warn('[WP-Analytics] Init failed (likely blocked by ad-blocker):', e);
+        window.__wp_logEvent = () => {};
+        window.__wp_setUserId = () => {};
+    }
+</script>
+
+<script type="module">
+    // Firebase Messaging is not universally supported in browsers (Safari
+    // historically, Chrome with certain flags, all incognito modes on
+    // some platforms). Call isSupported() BEFORE getMessaging() — the
+    // bare getMessaging() throws "messaging/unsupported-browser" and
+    // surfaces as an uncaught runtime error in the user's console.
+    import { isSupported, getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging.js';
+
+    // Always install a stub getToken so callers don't have to feature-detect.
+    window.__wp_fcm_getToken = async () => '';
+
+    if (window.__wp_firebase_app) {
+        isSupported().then((supported) => {
+            if (!supported) {
+                console.log('[WP-FCM] Messaging not supported in this browser — push notifications disabled.');
+                return;
+            }
+            try {
+                const messaging = getMessaging(window.__wp_firebase_app);
+                window.__wp_fcm_getToken = async (vapidKey) => {
+                    try {
+                        const permission = await Notification.requestPermission();
+                        if (permission !== 'granted') return '';
+                        const token = await getToken(messaging, { vapidKey });
+                        return token || '';
+                    } catch(e) {
+                        console.warn('[WP-FCM] getToken failed:', e);
+                        return '';
+                    }
+                };
+                onMessage(messaging, (payload) => {
+                    console.log('[WP-FCM] Foreground message:', payload);
+                });
+            } catch(e) {
+                console.warn('[WP-FCM] Messaging init failed:', e);
+            }
+        }).catch((e) => {
+            // isSupported() itself rejects in private mode on some browsers.
+            // Swallow — push is non-critical for the watch experience.
+            console.warn('[WP-FCM] isSupported() failed:', e);
+        });
+    }
+</script>
+
+<script>
+    if ('serviceWorker' in navigator) {
+        // Resolve the SW path RELATIVE to the deploy directory so this works
+        // both at site root (e.g. localhost dev) and at a subpath
+        // (e.g. iamautotech.in/watchparty/). Using a hardcoded /firebase-…
+        // breaks the moment the app is hosted under a path other than /.
+        var swUrl = new URL('firebase-messaging-sw.js', document.baseURI).href;
+        navigator.serviceWorker.register(swUrl)
+            .then(function(reg) { console.log('[WP] Service worker registered:', swUrl); })
+            .catch(function(err) { console.warn('[WP] SW registration failed:', err); });
+    }
+</script>
+
+<!-- Google Identity Services (GIS) for Drive OAuth -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+    window.__wp_gis_requestToken = function(clientId, scopes) {
+        return new Promise(function(resolve, reject) {
+            try {
+                var client = google.accounts.oauth2.initTokenClient({
+                    client_id: clientId,
+                    scope: scopes,
+                    callback: function(response) {
+                        if (response.access_token) resolve(response.access_token);
+                        else reject(new Error(response.error || 'No token'));
+                    }
+                });
+                client.requestAccessToken();
+            } catch(e) { reject(e); }
+        });
+    };
+</script>
+
+<!-- RevenueCat Web Billing SDK — DISABLED on web for now.
+     The previous unpkg URL (purchases-js@1) 404'd because the package's
+     dist layout changed upstream, and trying to load a 404'd JS file
+     threw "Unexpected token '<<'" during page parse — which killed the
+     entire wasm bootstrap. Subscription billing isn't required to watch
+     a room on web; we install no-op stubs so any wasm call-site that
+     reaches for these globals gets a quiet null. Re-enable once we pin
+     a working CDN URL (jsdelivr @latest/+esm works as of writing). -->
+<script>
+    window.__wp_rc = null;
+    window.__wp_rc_init = async function() { return false; };
+    window.__wp_rc_getOfferings = async function() { return null; };
+    window.__wp_rc_purchase = async function() { return null; };
+    window.__wp_rc_getCustomerInfo = async function() { return null; };
+</script>
+
+<script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
+<script>
+    window.googletag = window.googletag || { cmd: [] };
+    googletag.cmd.push(function() {
+        googletag.defineSlot('/PLACEHOLDER_AD_UNIT/banner-top', [728, 90], 'wp-ad-banner-top')
+            .addService(googletag.pubads());
+        googletag.pubads().enableSingleRequest();
+        googletag.enableServices();
+    });
+</script>
+
+<div id="wp-ad-banner-top" style="position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 100; display: none;"></div>
+
+<!-- LiveKit Client JS SDK -->
+<script src="https://unpkg.com/livekit-client@2.17.3/dist/livekit-client.umd.js"></script>
+<script>
+    window.__wp_lk_room = null;
+    // identity -> Set<HTMLVideoElement>. A renderer registers here BEFORE the
+    // remote track may have arrived; we then re-attach inside trackSubscribed /
+    // localTrackPublished. Without this map, attaching once at mount silently
+    // no-ops whenever the publication isn't ready yet.
+    window.__wp_lk_videoBindings = window.__wp_lk_videoBindings || {};
+
+    function __wp_lk_tryAttachToBindings(participant) {
+        if (!participant) return;
+        var els = window.__wp_lk_videoBindings[participant.identity];
+        if (!els || els.size === 0) return;
+        participant.videoTrackPublications.forEach(function(pub) {
+            if (pub.track) {
+                els.forEach(function(el) {
+                    try { pub.track.attach(el); } catch (e) { console.error('[WP-LK] attach failed', e); }
+                });
+            }
+        });
+    }
+
+    window.__wp_lk_connect = async function(url, token) {
+        try {
+            const room = new LivekitClient.Room();
+            await room.connect(url, token);
+            window.__wp_lk_room = room;
+
+            // Re-attach any pre-registered renderers whenever a track lands.
+            room.on('trackSubscribed', function(track, pub, participant) {
+                if (track.kind === 'video') {
+                    __wp_lk_tryAttachToBindings(participant);
+                }
+            });
+            room.on('localTrackPublished', function(pub, participant) {
+                if (pub.kind === 'video') {
+                    __wp_lk_tryAttachToBindings(participant);
+                }
+            });
+            room.on('participantConnected', function(participant) {
+                __wp_lk_tryAttachToBindings(participant);
+            });
+            room.on('trackUnsubscribed', function(track) {
+                try { track.detach(); } catch (_) {}
+            });
+            // Stubs (polling drives state)
+            room.on('participantDisconnected', () => {});
+            room.on('activeSpeakersChanged', () => {});
+            room.on('connectionStateChanged', () => {});
+
+            // Local participant's camera track may already be published before
+            // the renderer mounts — attach once at connect time too.
+            __wp_lk_tryAttachToBindings(room.localParticipant);
+
+            console.log('[WP-LK] Connected to room');
+            return true;
+        } catch(e) {
+            console.error('[WP-LK] Connect failed:', e);
+            return false;
+        }
+    };
+
+    window.__wp_lk_disconnect = async function() {
+        if (window.__wp_lk_room) {
+            await window.__wp_lk_room.disconnect();
+            window.__wp_lk_room = null;
+            console.log('[WP-LK] Disconnected');
+        }
+    };
+
+    window.__wp_lk_setMicEnabled = async function(enabled) {
+        if (window.__wp_lk_room) {
+            await window.__wp_lk_room.localParticipant.setMicrophoneEnabled(enabled);
+        }
+    };
+
+    window.__wp_lk_setCameraEnabled = async function(enabled) {
+        if (window.__wp_lk_room) {
+            await window.__wp_lk_room.localParticipant.setCameraEnabled(enabled);
+        }
+    };
+
+    window.__wp_lk_getParticipants = function() {
+        if (!window.__wp_lk_room) return '[]';
+        var participants = [];
+
+        // Add local participant
+        var lp = window.__wp_lk_room.localParticipant;
+        participants.push({
+            identity: lp.identity,
+            name: lp.name || '',
+            isSpeaking: lp.isSpeaking,
+            isMicEnabled: lp.isMicrophoneEnabled,
+            isCameraEnabled: lp.isCameraEnabled,
+            connectionQuality: 'EXCELLENT'
+        });
+
+        // Add remote participants
+        window.__wp_lk_room.remoteParticipants.forEach(function(p) {
+            participants.push({
+                identity: p.identity,
+                name: p.name || '',
+                isSpeaking: p.isSpeaking,
+                isMicEnabled: p.isMicrophoneEnabled,
+                isCameraEnabled: p.isCameraEnabled,
+                connectionQuality: p.connectionQuality || 'UNKNOWN'
+            });
+        });
+        return JSON.stringify(participants);
+    };
+
+    window.__wp_lk_getConnectionState = function() {
+        if (!window.__wp_lk_room) return 'DISCONNECTED';
+        switch(window.__wp_lk_room.state) {
+            case 'connected': return 'CONNECTED';
+            case 'connecting': return 'CONNECTING';
+            case 'reconnecting': return 'RECONNECTING';
+            default: return 'DISCONNECTED';
+        }
+    };
+
+    window.__wp_lk_attachVideo = function(identity, videoElement) {
+        // Always register the binding so events can re-attach later, even if
+        // the room isn't connected yet or the track hasn't been published.
+        if (!window.__wp_lk_videoBindings[identity]) {
+            window.__wp_lk_videoBindings[identity] = new Set();
+        }
+        window.__wp_lk_videoBindings[identity].add(videoElement);
+
+        if (!window.__wp_lk_room) return true; // will attach on connect
+        var participant = null;
+        if (window.__wp_lk_room.localParticipant.identity === identity) {
+            participant = window.__wp_lk_room.localParticipant;
+        } else {
+            participant = window.__wp_lk_room.remoteParticipants.get(identity);
+        }
+        if (!participant) return true; // will attach on participantConnected
+
+        participant.videoTrackPublications.forEach(function(pub) {
+            if (pub.track) {
+                try { pub.track.attach(videoElement); } catch (e) { console.error('[WP-LK] attach', e); }
+            }
+        });
+        return true;
+    };
+
+    window.__wp_lk_detachVideo = function(videoElement) {
+        // Remove from all bindings.
+        if (window.__wp_lk_videoBindings) {
+            Object.keys(window.__wp_lk_videoBindings).forEach(function(k) {
+                window.__wp_lk_videoBindings[k].delete(videoElement);
+            });
+        }
+        if (videoElement.srcObject) {
+            videoElement.srcObject.getTracks().forEach(function(t) { t.stop(); });
+            videoElement.srcObject = null;
+        }
+    };
+</script>
+
+<script src="watchparty.js"></script>
+</body>
+</html>
