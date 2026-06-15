@@ -13,17 +13,22 @@
   [headers.values]
     Content-Type = "application/wasm"
 
-# ── Long-cache the hashed app bundles (filename changes on content change,
-#    so cache-busting is automatic) ──
+# ── .wasm files ARE content-hashed (e.g. ec230303974fdfd7aee4.wasm), so the
+#    filename changes on every content change → safe to cache forever. ──
 [[headers]]
   for = "/app/*.wasm"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# ── .js files are NOT content-hashed by the Kotlin/wasm webpack output — the
+#    entry (watchparty.js) and chunks (840.js, 90.js) keep STABLE names across
+#    builds. Caching them "immutable" pinned returning visitors to whatever JS
+#    they first downloaded (they saw a months-old UI even after redeploys).
+#    Revalidate every load instead: cheap 304 when unchanged, fresh when not. ──
 [[headers]]
   for = "/app/*.js"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 # ── App entry point must always refresh on redeploy ──
 [[headers]]
