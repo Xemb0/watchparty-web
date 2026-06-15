@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<!--
+  Google Drive Picker bridge for the drive.file scope migration.
+
+  Loaded by DrivePickerSheet (Android + iOS) via loadDataWithBaseURL /
+  loadHTMLString. Three placeholders are substituted at load time by the
+  native host BEFORE the HTML reaches the WebView:
+    __ACCESS_TOKEN__    OAuth token with at least https://www.googleapis.com/auth/drive.file
+    __API_KEY__         BuildConfig.DRIVE_PICKER_API_KEY (Google Cloud project API key)
+    __APP_ID__          BuildConfig.DRIVE_PICKER_APP_ID  (Google Cloud project number / app id)
+
+  The user picks a video file → we post the result back through the
+  wpbridge:// scheme, intercepted in shouldOverrideUrlLoading (Android) /
+  decidePolicyFor (iOS):
+    wpbridge://drivepick?fileId=<id>&name=<name>
+    wpbridge://drivecancel
+    wpbridge://driveerror?message=<text>
+
+  Native side parses the query, calls DriveService.makeFilePublic +
+  resolveDriveStreamUrl, and dispatches the resolved URL to the room
+  player — same code path as the existing WebBrowseSheet picks.
+
+  Why no JS interface (postMessage / wpbridge object): WebView/WKWebView
+  expose them under different APIs (addJavascriptInterface vs
+  webkit.messageHandlers). location.href = "wpbridge://..." works
+  identically on both platforms with shouldOverrideUrlLoading /
+  decidePolicyFor — single code path, no expect/actual JS glue.
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Pick a Drive video</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: #121212;
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+  }
+  #status {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .err {
+    color: #FBBF24;
+  }
+</style>
+</head>
+<body>
+  <div id="status">Loading Drive Picker…</div>
+  <script>
+    // Bridge endpoint helpers — every native callback goes through one
+    // of these. Using location.href instead of postMessage so the same
+    // path works on Android WebView (shouldOverrideUrlLoading) and iOS
+    // WKWebView (decidePolicyForNavigationAction).
+    function bridge(path, params) {
+      var qs = '';
+      if (params) {
+        var first = true;
+        for (var k in params) {
+          if (!params.hasOwnProperty(k)) continue;
+          qs += (first ? '?' : '&') + encodeURIComponent(k) + '=' + encodeURIComponent(params[k] || '');
+          first = false;
+        }
+      }
+      try { window.location.href = 'wpbridge://' + path + qs; } catch (e) {}
+    }
+    function showError(msg) {
+      var s = document.getElementById('status');
+      if (s) { s.className = 'err'; s.textContent = msg; }
+      bridge('driveerror', { message: msg });
+    }
+
+    // Placeholders substituted by native side at load time. Validate
+    // before loading the Picker so the user sees a clear error instead
+    // of a silent failure when local.properties is missing entries.
+    var ACCESS_TOKEN = "__ACCESS_TOKEN__";
+    var API_KEY = "__API_KEY__";
+    var APP_ID = "__APP_ID__";
+    if (!ACCESS_TOKEN || ACCESS_TOKEN === "__" + "ACCESS_TOKEN__") {
+      showError('Drive Picker: missing access token.');
+    } else if (!API_KEY || API_KEY === "__" + "API_KEY__") {
+      showError('Drive Picker: missing API key. Set DRIVE_PICKER_API_KEY in local.properties.');
+    } else if (!APP_ID || APP_ID === "__" + "APP_ID__") {
+      showError('Drive Picker: missing app id. Set DRIVE_PICKER_APP_ID in local.properties.');
+    } else {
+      var gapiScript = document.createElement('script');
+      gapiScript.src = 'https://apis.google.com/js/api.js';
+      gapiScript.onload = function() {
+        try {
+          gapi.load('picker', { callback: onPickerApiLoad });
+        } catch (e) {
+          showError('Failed to initialize Picker: ' + (e && e.message ? e.message : e));
+        }
+      };
+      gapiScript.onerror = function() {
+        showError('Could not load Google Picker (network blocked?).');
+      };
+      document.head.appendChild(gapiScript);
+    }
+
+    function onPickerApiLoad() {
+      try {
+        // VIDEO view scopes the file list to video MIME types only;
+        // DOCS_VIDEOS is the canonical Picker.ViewId for that. Mobile
+        // size hints keep the modal usable inside a phone-sized
+        // WebView (Picker auto-falls back to a full-screen dialog
+        // below a width threshold).
+        var view = new google.picker.View(google.picker.ViewId.DOCS_VIDEOS);
+        var picker = new google.picker.PickerBuilder()
+          .addView(view)
+          .setOAuthToken(ACCESS_TOKEN)
+          .setDeveloperKey(API_KEY)
+          .setAppId(APP_ID)
+          .enableFeature(google.picker.Feature.NAV_HIDDEN)
+          .setCallback(pickerCallback)
+          .build();
+        picker.setVisible(true);
+        // Hide the loading text once the modal is up — the Picker
+        // renders its own scrim over the body.
+        var s = document.getElementById('status');
+        if (s) s.style.display = 'none';
+      } catch (e) {
+        showError('Picker build failed: ' + (e && e.message ? e.message : e));
+      }
+    }
+
+    function pickerCallback(data) {
+      try {
+        var action = data[google.picker.Response.ACTION];
+        if (action === google.picker.Action.PICKED) {
+          var docs = data[google.picker.Response.DOCUMENTS] || [];
+          if (docs.length === 0) {
+            bridge('drivecancel');
+            return;
+          }
+          var doc = docs[0];
+          bridge('drivepick', {
+            fileId: doc[google.picker.Document.ID] || '',
+            name: doc[google.picker.Document.NAME] || '',
+            mimeType: doc[google.picker.Document.MIME_TYPE] || '',
+          });
+        } else if (action === google.picker.Action.CANCEL) {
+          bridge('drivecancel');
+        }
+      } catch (e) {
+        showError('Picker callback failed: ' + (e && e.message ? e.message : e));
+      }
+    }
+  </script>
+</body>
+</html>
