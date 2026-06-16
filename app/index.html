@@ -424,6 +424,18 @@
             // the renderer mounts — attach once at connect time too.
             __wp_lk_tryAttachToBindings(room.localParticipant);
 
+            // Apply a camera toggle that arrived during the connect gap.
+            if (window.__wp_lk_pendingCamera !== null) {
+                var want = window.__wp_lk_pendingCamera; window.__wp_lk_pendingCamera = null;
+                try {
+                    await room.localParticipant.setCameraEnabled(want);
+                    __wp_lk_tryAttachToBindings(room.localParticipant);
+                } catch (e) {
+                    console.error('[WP-LK] flush camera failed', e);
+                    window.__wp_lk_lastCameraError = (e && e.name ? e.name + ': ' : '') + (e && e.message ? e.message : 'camera failed');
+                }
+            }
+
             console.log('[WP-LK] Connected to room');
             return true;
         } catch(e) {
@@ -441,14 +453,44 @@
     };
 
     window.__wp_lk_setMicEnabled = async function(enabled) {
-        if (window.__wp_lk_room) {
-            await window.__wp_lk_room.localParticipant.setMicrophoneEnabled(enabled);
-        }
+        if (!window.__wp_lk_room) return false;
+        try { await window.__wp_lk_room.localParticipant.setMicrophoneEnabled(enabled); return true; }
+        catch (e) { console.error('[WP-LK] setMicEnabled failed:', e); throw e; }
+    };
+
+    window.__wp_lk_lastCameraError = '';
+    window.__wp_lk_pendingCamera = null;
+
+    // Reattach the local publication to any registered renderer (heals the brief
+    // trackID:undefined window right after the camera track publishes).
+    window.__wp_lk_reattachLocal = function() {
+        if (window.__wp_lk_room) { __wp_lk_tryAttachToBindings(window.__wp_lk_room.localParticipant); }
+    };
+
+    // Gesture-driven permission primer so the browser shows its camera prompt
+    // reliably even if LiveKit's internal getUserMedia is deferred.
+    window.__wp_lk_requestMediaPermission = async function() {
+        try {
+            var s = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+            s.getTracks().forEach(function(t){ t.stop(); });
+            return true;
+        } catch (e) { console.warn('[WP-LK] media permission denied/failed:', e && e.name); return false; }
     };
 
     window.__wp_lk_setCameraEnabled = async function(enabled) {
-        if (window.__wp_lk_room) {
+        // Queue the intent if toggled during the connect gap; the connect flush applies it.
+        if (!window.__wp_lk_room) { window.__wp_lk_pendingCamera = enabled; return false; }
+        try {
             await window.__wp_lk_room.localParticipant.setCameraEnabled(enabled);
+            __wp_lk_tryAttachToBindings(window.__wp_lk_room.localParticipant);
+            return true;
+        } catch (e) {
+            // NotAllowedError (permission) / NotReadableError (device busy) etc.
+            // Latch so the Kotlin poll can surface it + reset the toggle (this
+            // async rejection can't reach the Kotlin try/catch).
+            console.error('[WP-LK] setCameraEnabled failed:', e);
+            window.__wp_lk_lastCameraError = (e && e.name ? e.name + ': ' : '') + (e && e.message ? e.message : 'camera failed');
+            throw e;
         }
     };
 
