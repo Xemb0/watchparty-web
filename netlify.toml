@@ -36,9 +36,34 @@
   [headers.values]
     Cache-Control = "no-store, no-cache, must-revalidate"
 
+# ── PWA manifest: correct MIME so the browser parses it; revalidate (not
+#    content-hashed). ──
+[[headers]]
+  for = "/app/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# ── Service worker: MUST always revalidate so a fixed SW propagates — this is
+#    the ONLY self-update / recovery channel for installed clients. Placed after
+#    the /app/*.js rule above so this no-store value wins for the SW file. ──
+[[headers]]
+  for = "/app/firebase-messaging-sw.js"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate"
+    Service-Worker-Allowed = "/app/"
+
+# ── PWA icons: stable names, change rarely — a day's cache is fine. ──
+[[headers]]
+  for = "/app/icons/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
 # ── SPA fallback for the Compose client-side router: any deep URL under
 #    /app (e.g. /app/room/ABCD) serves the app's index.html so refresh +
-#    deep links resolve instead of 404. status 200 = rewrite, not redirect. ──
+#    deep links resolve instead of 404. status 200 = rewrite, not redirect.
+#    No force=true, so real static files (manifest, icons, SW) are served
+#    directly and are NOT shadowed by this rewrite. ──
 [[redirects]]
   from = "/app/*"
   to = "/app/index.html"

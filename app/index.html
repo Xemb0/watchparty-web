@@ -2,8 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>WatchParty</title>
+
+    <!-- PWA: installable web app. All paths are ROOT-ABSOLUTE (/app/...) so they
+         resolve correctly even on deep routes served via the SPA rewrite
+         (e.g. /app/room/ABCD), where document-relative paths would 404. -->
+    <link rel="manifest" href="/app/manifest.webmanifest">
+    <meta name="theme-color" content="#1a1a2e">
+    <link rel="icon" type="image/png" sizes="32x32" href="/app/icons/favicon-32.png">
+    <!-- iOS Safari "Add to Home Screen" (ignores the manifest — uses these). -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="WatchParty">
+    <link rel="apple-touch-icon" sizes="180x180" href="/app/icons/apple-touch-icon.png">
     <style>
         html, body {
             margin: 0;
@@ -269,7 +282,11 @@
                     try {
                         const permission = await Notification.requestPermission();
                         if (permission !== 'granted') return '';
-                        const token = await getToken(messaging, { vapidKey });
+                        // Pass our /app/ service worker explicitly. Without it the
+                        // SDK tries to register /firebase-messaging-sw.js at the
+                        // ROOT (404 here) and getToken fails — no web push.
+                        const reg = await navigator.serviceWorker.ready;
+                        const token = await getToken(messaging, { vapidKey, serviceWorkerRegistration: reg });
                         return token || '';
                     } catch(e) {
                         console.warn('[WP-FCM] getToken failed:', e);
@@ -292,13 +309,13 @@
 
 <script>
     if ('serviceWorker' in navigator) {
-        // Resolve the SW path RELATIVE to the deploy directory so this works
-        // both at site root (e.g. localhost dev) and at a subpath
-        // (e.g. iamautotech.in/watchparty/). Using a hardcoded /firebase-…
-        // breaks the moment the app is hosted under a path other than /.
-        var swUrl = new URL('firebase-messaging-sw.js', document.baseURI).href;
-        navigator.serviceWorker.register(swUrl)
-            .then(function(reg) { console.log('[WP] Service worker registered:', swUrl); })
+        // Pin to the ABSOLUTE /app/ path + explicit scope. A document-relative
+        // path drifts on deep routes (/app/room/ABCD -> /app/room/firebase-…sw.js
+        // which the SPA rewrite answers with index.html), breaking BOTH FCM and
+        // PWA install on deep-link first loads. updateViaCache:'none' guarantees
+        // the SW script itself is always revalidated (self-update / recovery).
+        navigator.serviceWorker.register('/app/firebase-messaging-sw.js', { scope: '/app/', updateViaCache: 'none' })
+            .then(function(reg) { console.log('[WP] Service worker registered:', reg.scope); })
             .catch(function(err) { console.warn('[WP] SW registration failed:', err); });
     }
 </script>
@@ -514,5 +531,104 @@
 </script>
 
 <script src="watchparty.js"></script>
+
+<!-- ─────────────────────────────────────────────────────────────────────────
+     PWA install prompt. A dismissible bottom banner that:
+       • Android/desktop Chrome/Edge: captures beforeinstallprompt and offers a
+         one-tap Install button.
+       • iOS Safari (no beforeinstallprompt): shows "tap Share then Add to Home
+         Screen" instructions.
+     Hidden entirely when already installed (standalone) or recently dismissed.
+     Pure DOM (z-index above the Compose canvas), independent of the wasm app.
+     ───────────────────────────────────────────────────────────────────────── -->
+<style>
+  #wpInstallBanner {
+    position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 2147483000;
+    display: none; align-items: center; gap: 12px;
+    max-width: 460px; margin: 0 auto; padding: 12px 14px;
+    border-radius: 16px; box-sizing: border-box;
+    background: linear-gradient(135deg, #211C30, #141019);
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #fff;
+  }
+  #wpInstallBanner.show { display: flex; }
+  #wpInstallBanner img { width: 44px; height: 44px; border-radius: 12px; flex: 0 0 auto; }
+  #wpInstallBanner .wp-txt { flex: 1 1 auto; min-width: 0; }
+  #wpInstallBanner .wp-title { font-size: 14px; font-weight: 700; }
+  #wpInstallBanner .wp-sub { font-size: 12px; color: rgba(255,255,255,0.62); line-height: 16px; margin-top: 2px; }
+  #wpInstallBanner .wp-install {
+    flex: 0 0 auto; border: none; cursor: pointer;
+    background: linear-gradient(90deg, #9333EA, #EC4899);
+    color: #fff; font-weight: 600; font-size: 13px;
+    padding: 9px 16px; border-radius: 12px;
+  }
+  #wpInstallBanner .wp-close {
+    flex: 0 0 auto; background: rgba(255,255,255,0.08); border: none; cursor: pointer;
+    color: rgba(255,255,255,0.85); width: 28px; height: 28px; border-radius: 14px; font-size: 16px;
+  }
+</style>
+<div id="wpInstallBanner">
+  <img src="/app/icons/icon-192.png" alt="WatchParty">
+  <div class="wp-txt">
+    <div class="wp-title">Install WatchParty</div>
+    <div class="wp-sub" id="wpInstallSub">Add it to your home screen for full-screen, app-like watch parties.</div>
+  </div>
+  <button class="wp-install" id="wpInstallBtn">Install</button>
+  <button class="wp-close" id="wpInstallClose" aria-label="Dismiss">&times;</button>
+</div>
+<script>
+  (function () {
+    var KEY = 'wp_install_dismissed_at';
+    var DISMISS_DAYS = 14;
+    var banner = document.getElementById('wpInstallBanner');
+    var sub = document.getElementById('wpInstallSub');
+    var btn = document.getElementById('wpInstallBtn');
+    var closeBtn = document.getElementById('wpInstallClose');
+    var deferred = null;
+
+    function isStandalone() {
+      return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    }
+    function recentlyDismissed() {
+      try {
+        var t = parseInt(localStorage.getItem(KEY) || '0', 10);
+        return t && (Date.now() - t) < DISMISS_DAYS * 86400000;
+      } catch (e) { return false; }
+    }
+    function isIos() {
+      return /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+             (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPadOS
+    }
+    function show() { if (!isStandalone() && !recentlyDismissed()) banner.classList.add('show'); }
+    function hide() { banner.classList.remove('show'); }
+    function dismiss() { try { localStorage.setItem(KEY, String(Date.now())); } catch (e) {} hide(); }
+
+    closeBtn.addEventListener('click', dismiss);
+
+    // Android / desktop Chromium.
+    window.addEventListener('beforeinstallprompt', function (e) {
+      e.preventDefault();
+      deferred = e;
+      show();
+    });
+    btn.addEventListener('click', function () {
+      if (deferred) {
+        deferred.prompt();
+        deferred.userChoice.finally(function () { deferred = null; hide(); });
+      }
+    });
+    window.addEventListener('appinstalled', function () { dismiss(); });
+
+    // iOS Safari: no beforeinstallprompt — show manual instructions.
+    if (isIos() && !isStandalone()) {
+      btn.style.display = 'none';
+      sub.innerHTML = "Tap the Share button, then <b>Add to Home Screen</b>.";
+      // Slight delay so it doesn't fight the first paint.
+      setTimeout(show, 2500);
+    }
+  })();
+</script>
 </body>
 </html>
