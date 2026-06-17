@@ -369,6 +369,22 @@
 
 <div id="wp-ad-banner-top" style="position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 100; display: none;"></div>
 
+<!-- Exit guard: ask before the user leaves the app (tab close / refresh /
+     browser back / swipe-/flick-back that would exit the site). Armed only once
+     the user is in the app (see __wp_setConfirmExit), so OAuth redirects and the
+     login screen don't prompt. -->
+<script>
+    window.__wp_confirmExit = false;
+    window.__wp_setConfirmExit = function(on) { window.__wp_confirmExit = !!on; };
+    window.addEventListener('beforeunload', function(e) {
+        if (window.__wp_confirmExit) {
+            e.preventDefault();
+            e.returnValue = '';
+            return '';
+        }
+    });
+</script>
+
 <!-- LiveKit Client JS SDK -->
 <script src="https://unpkg.com/livekit-client@2.17.3/dist/livekit-client.umd.js"></script>
 <script>
