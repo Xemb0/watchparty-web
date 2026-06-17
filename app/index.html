@@ -5,6 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>WatchParty</title>
 
+    <!-- UI-language bootstrap: Compose-Multiplatform has no public runtime locale
+         override on web (CMP-8376), and it reads navigator.language ONCE at wasm
+         init. So BEFORE the wasm loads, read the user's chosen language (the
+         dedicated wp_ui_locale key, else the persisted user-details) and spoof
+         navigator.language/languages so every resource resolves in that language.
+         The in-app picker writes wp_ui_locale + reloads (see LanguageManagerHook). -->
+    <script>
+    (function () {
+        try {
+            var lang = window.localStorage.getItem('wp_ui_locale');
+            if (!lang) {
+                var ud = window.localStorage.getItem('wp_user_details');
+                if (ud) { try { var o = JSON.parse(ud); if (o && o.language) lang = o.language; } catch (e) {} }
+            }
+            if (lang && /^[a-zA-Z]{2}/.test(lang)) {
+                var code = lang;
+                try { Object.defineProperty(navigator, 'language', { get: function () { return code; }, configurable: true }); } catch (e) {}
+                try { Object.defineProperty(navigator, 'languages', { get: function () { return [code]; }, configurable: true }); } catch (e) {}
+            }
+        } catch (e) {}
+    })();
+    </script>
+
     <!-- PWA: installable web app. All paths are ROOT-ABSOLUTE (/app/...) so they
          resolve correctly even on deep routes served via the SPA rewrite
          (e.g. /app/room/ABCD), where document-relative paths would 404. -->
