@@ -363,6 +363,44 @@
     };
 </script>
 
+<!-- Google Picker API — Drive file picker (drive.file scope, matches Android).
+     The user picks a video; the app gets per-file access (no full-Drive scope,
+     no "unverified app" warning). Returns {id,name} JSON or '' on cancel. -->
+<script src="https://apis.google.com/js/api.js" async defer></script>
+<script>
+    window.__wp_drive_picker = function(accessToken) {
+        return new Promise(function(resolve, reject) {
+            try {
+                if (typeof gapi === 'undefined') { reject(new Error('Google API not loaded')); return; }
+                gapi.load('picker', function() {
+                    try {
+                        var view = new google.picker.DocsView(google.picker.ViewId.DOCS_VIDEOS);
+                        var picker = new google.picker.PickerBuilder()
+                            .setOAuthToken(accessToken)
+                            .setDeveloperKey('AIzaSyBuMHF60UVcAEwqlfzLdg3mBvyaw73odEw')
+                            .setAppId('423168474803')
+                            .addView(view)
+                            .setCallback(function(data) {
+                                var a = data[google.picker.Response.ACTION];
+                                if (a === google.picker.Action.PICKED) {
+                                    var doc = data[google.picker.Response.DOCUMENTS][0];
+                                    resolve(JSON.stringify({
+                                        id: doc[google.picker.Document.ID],
+                                        name: doc[google.picker.Document.NAME] || 'Drive video'
+                                    }));
+                                } else if (a === google.picker.Action.CANCEL) {
+                                    resolve('');
+                                }
+                            })
+                            .build();
+                        picker.setVisible(true);
+                    } catch (e) { reject(e); }
+                });
+            } catch (e) { reject(e); }
+        });
+    };
+</script>
+
 <!-- RevenueCat Web Billing SDK — DISABLED on web for now.
      The previous unpkg URL (purchases-js@1) 404'd because the package's
      dist layout changed upstream, and trying to load a 404'd JS file
