@@ -394,6 +394,13 @@
     // so the Compose speaking-glow ring lights up. Initialised here so a poll
     // that races ahead of connect doesn't hit undefined.
     window.__wp_lk_activeSpeakers = {};
+    // Inbound LiveKit data packets (playback-sync, etc.). DataReceived fires on
+    // JS; taking a JS callback into wasm is costly, so we QUEUE here and Kotlin
+    // drains via __wp_lk_drainData() on a poll (mirrors participant polling).
+    // base64 marshals the bytes across the primitive-only @JsFun boundary.
+    window.__wp_lk_dataQueue = [];
+    function __wp_lk_bytesToB64(u8) { var s = ''; for (var i = 0; i < u8.length; i++) s += String.fromCharCode(u8[i]); return btoa(s); }
+    function __wp_lk_b64ToBytes(b64) { var s = atob(b64); var u8 = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) u8[i] = s.charCodeAt(i); return u8; }
     // identity -> Set<HTMLVideoElement>. A renderer registers here BEFORE the
     // remote track may have arrived; we then re-attach inside trackSubscribed /
     // localTrackPublished. Without this map, attaching once at mount silently
@@ -449,6 +456,17 @@
                 window.__wp_lk_activeSpeakers = map;
             });
             room.on('connectionStateChanged', () => {});
+            // Queue inbound data packets; Kotlin's poll drains + emits them.
+            room.on('dataReceived', function(payload, participant, kind, topic) {
+                try {
+                    window.__wp_lk_dataQueue.push({
+                        b64: __wp_lk_bytesToB64(payload),
+                        identity: (participant && participant.identity) ? participant.identity : '',
+                        topic: topic || '',
+                    });
+                    if (window.__wp_lk_dataQueue.length > 256) window.__wp_lk_dataQueue.shift();
+                } catch (e) { console.error('[WP-LK] dataReceived failed', e); }
+            });
 
             // Local participant's camera track may already be published before
             // the renderer mounts — attach once at connect time too.
@@ -487,11 +505,31 @@
     };
 
     window.__wp_lk_disconnect = async function() {
+        window.__wp_lk_dataQueue = [];
         if (window.__wp_lk_room) {
             await window.__wp_lk_room.disconnect();
             window.__wp_lk_room = null;
             console.log('[WP-LK] Disconnected');
         }
+    };
+
+    // Send a data packet over the LiveKit room (playback-sync, reactions, …).
+    // Mirrors mobile so web sync goes through LiveKit, not the Supabase fallback.
+    window.__wp_lk_publishData = async function(b64, reliable, topic) {
+        if (!window.__wp_lk_room) return false;
+        try {
+            var bytes = __wp_lk_b64ToBytes(b64);
+            var opts = { reliable: !!reliable };
+            if (topic) opts.topic = topic;
+            await window.__wp_lk_room.localParticipant.publishData(bytes, opts);
+            return true;
+        } catch (e) { console.error('[WP-LK] publishData failed:', e); return false; }
+    };
+    // Return + clear the queued inbound packets (Kotlin decodes the base64).
+    window.__wp_lk_drainData = function() {
+        var q = window.__wp_lk_dataQueue;
+        window.__wp_lk_dataQueue = [];
+        return JSON.stringify(q || []);
     };
 
     window.__wp_lk_setMicEnabled = async function(enabled) {
