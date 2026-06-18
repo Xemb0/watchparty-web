@@ -365,7 +365,15 @@
 
 <!-- Google Picker API — Drive file picker (drive.file scope, matches Android).
      The user picks a video; the app gets per-file access (no full-Drive scope,
-     no "unverified app" warning). Returns {id,name} JSON or '' on cancel. -->
+     no "unverified app" warning). Returns {id,name} JSON or '' on cancel.
+     NOTE: the picker is desktop-oriented; on mobile browsers it can fail to
+     post its selection back — the wasm side also offers a paste-a-link path. -->
+<style>
+    /* The picker dialog mounts on document.body; keep it above the canvas and
+       every DOM overlay so it is visible + clickable. */
+    .picker-dialog-bg { z-index: 2147483640 !important; }
+    .picker-dialog    { z-index: 2147483641 !important; }
+</style>
 <script src="https://apis.google.com/js/api.js" async defer></script>
 <script>
     window.__wp_drive_picker = function(accessToken) {
@@ -375,7 +383,12 @@
                 gapi.load('picker', function() {
                     try {
                         var view = new google.picker.DocsView(google.picker.ViewId.DOCS_VIDEOS);
+                        view.setIncludeFolders(true);
+                        // setOrigin is REQUIRED when the page is served from a
+                        // sub-path (/app/) — without it the picker's postMessage
+                        // callback never reaches us, so "I pick and nothing happens".
                         var picker = new google.picker.PickerBuilder()
+                            .setOrigin(window.location.protocol + '//' + window.location.host)
                             .setOAuthToken(accessToken)
                             .setDeveloperKey('AIzaSyBuMHF60UVcAEwqlfzLdg3mBvyaw73odEw')
                             .setAppId('423168474803')
