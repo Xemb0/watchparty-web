@@ -68,29 +68,29 @@
 
           <!-- Platform badges with real brand logos -->
           <div class="grid grid-cols-3 gap-3 mb-6">
-            <!-- Android -->
-            <div class="flex flex-col items-center gap-2 rounded-xl py-4 bg-white/[0.03] border border-white/10 hover:border-[#3DDC84]/50 transition-colors">
+            <!-- Android (→ download page) -->
+            <a href="/download" class="flex flex-col items-center gap-2 rounded-xl py-4 bg-white/[0.03] border border-white/10 hover:border-[#3DDC84]/50 transition-colors cursor-pointer">
               <svg class="w-7 h-7" viewBox="0 0 24 24" fill="#3DDC84"><path d="M17.523 15.341a1.001 1.001 0 1 1 0-2.002 1.001 1.001 0 0 1 0 2.002m-11.046 0a1.001 1.001 0 1 1 0-2.002 1.001 1.001 0 0 1 0 2.002m11.405-6.02 1.997-3.46a.416.416 0 0 0-.152-.567.416.416 0 0 0-.568.152l-2.022 3.503a12.331 12.331 0 0 0-5.137-1.103c-1.84 0-3.583.398-5.138 1.103L4.842 4.946a.416.416 0 0 0-.568-.152.416.416 0 0 0-.152.567l1.997 3.46C2.687 11.07.605 14.32.605 18.073h22.79c0-3.752-2.082-7.003-5.513-8.752"/></svg>
               <div class="text-center leading-tight">
                 <div class="text-[13px] font-semibold text-white">Android</div>
-                <div class="text-[10px] text-green-400/80 font-medium">Live now</div>
+                <div class="text-[10px] text-green-400/80 font-medium">Get the APK →</div>
               </div>
-            </div>
-            <!-- iOS / Apple -->
-            <div class="flex flex-col items-center gap-2 rounded-xl py-4 bg-white/[0.03] border border-blue-400/30 hover:border-blue-400/60 transition-colors relative overflow-hidden">
+            </a>
+            <!-- iOS / Apple (→ TestFlight beta signup) -->
+            <a href="/#ios-beta" class="flex flex-col items-center gap-2 rounded-xl py-4 bg-white/[0.03] border border-blue-400/30 hover:border-blue-400/60 transition-colors relative overflow-hidden cursor-pointer">
               <span class="absolute top-1.5 right-1.5 text-[8px] font-bold tracking-wider text-blue-300 bg-blue-500/20 px-1.5 py-0.5 rounded">BETA</span>
               <svg class="w-7 h-7" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg>
               <div class="text-center leading-tight">
                 <div class="text-[13px] font-semibold text-white">iOS</div>
                 <div class="text-[10px] text-blue-300 font-medium">Beta open</div>
               </div>
-            </div>
-            <!-- Web (clickable → launches the in-browser app) -->
-            <a href="/app/" class="flex flex-col items-center gap-2 rounded-xl py-4 bg-white/[0.03] border border-white/10 hover:border-purple-400/50 transition-colors cursor-pointer">
+            </a>
+            <!-- Web (clickable → launches the in-browser app; emphasized as the instant option) -->
+            <a href="/app/" class="flex flex-col items-center gap-2 rounded-xl py-4 bg-purple-500/10 border border-purple-400/50 hover:border-purple-400 hover:bg-purple-500/20 transition-colors cursor-pointer">
               <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.6"><circle cx="12" cy="12" r="9.5"/><ellipse cx="12" cy="12" rx="4" ry="9.5"/><path d="M2.5 12h19M4 7h16M4 17h16"/></svg>
               <div class="text-center leading-tight">
                 <div class="text-[13px] font-semibold text-white">Web</div>
-                <div class="text-[10px] text-purple-300/80 font-medium">In browser</div>
+                <div class="text-[10px] text-purple-300 font-medium">Launch now →</div>
               </div>
             </a>
           </div>
@@ -113,13 +113,16 @@
         </div>
         
         <div class="flex flex-wrap gap-4 justify-center lg:justify-start">
-          <a href="files/watchparty.apk" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-8 py-4 rounded-full font-bold text-white transform hover:scale-105 transition-all duration-300 glow-effect" download>
-            📱 Download Android APK
+          <a href="/app/" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-8 py-4 rounded-full font-bold text-white transform hover:scale-105 transition-all duration-300 glow-effect">
+            🚀 Launch Web App
           </a>
-          <a href="https://play.google.com/store/apps/details?id=com.autotech.watchparty" class="bg-gray-800 hover:bg-gray-700 px-8 py-4 rounded-full font-bold text-white border border-gray-600 transform hover:scale-105 transition-all duration-300">
-            📦 Google Play Store
+          <a href="/download" class="bg-gray-800 hover:bg-gray-700 px-8 py-4 rounded-full font-bold text-white border border-gray-600 transform hover:scale-105 transition-all duration-300">
+            ⬇️ Download App
           </a>
         </div>
+        <p class="text-sm text-purple-200/80 mt-3 text-center lg:text-left">
+          ▶ No download needed — WatchParty runs right in your browser. Or get the Android, iOS &amp; desktop apps from the <a href="/download" class="underline underline-offset-2 hover:text-white">download page</a>.
+        </p>
         
         <div class="mt-8 text-center lg:text-left">
           <p class="text-gray-400 text-sm">🚀 Join over 10,000+ users watching together!</p>
@@ -287,11 +290,11 @@
             <h4 class="font-semibold text-blue-300">Launch Web App →</h4>
             <p class="text-sm text-gray-300 mt-1">Watch right in your browser</p>
           </a>
-          <div class="bg-gray-800/50 rounded-xl p-4 backdrop-blur-sm">
+          <a href="/app/" class="bg-gray-800/50 rounded-xl p-4 backdrop-blur-sm block hover:bg-gray-700/60 transition-all transform hover:scale-105 border border-transparent hover:border-green-500/40">
             <div class="text-2xl mb-2">💻</div>
-            <h4 class="font-semibold text-green-300">Desktop Apps</h4>
-            <p class="text-sm text-gray-400 mt-1">Windows & macOS</p>
-          </div>
+            <h4 class="font-semibold text-green-300">On Desktop →</h4>
+            <p class="text-sm text-gray-300 mt-1">Windows &amp; macOS — in your browser</p>
+          </a>
           <div class="bg-gray-800/50 rounded-xl p-4 backdrop-blur-sm">
             <div class="text-2xl mb-2">🎬</div>
             <h4 class="font-semibold text-pink-300">More Features</h4>
@@ -476,16 +479,22 @@
   function getRoomId() {
     return (new URLSearchParams(window.location.search).get('roomId') || '').trim();
   }
-  var PLAY_URL = 'https://play.google.com/store/apps/details?id=com.autotech.watchparty';
+  // The app was pulled from the Play Store, so the no-app fallback now opens
+  // the web app (join the room straight in the browser) instead of a store page.
+  function webAppUrl(roomId) {
+    var base = window.location.origin + '/app/';
+    return roomId ? base + '?roomId=' + encodeURIComponent(roomId) : base;
+  }
   function buildIntent(roomId) {
     return 'intent://imautotech.in/our_products/watch_party/watchparty?roomId='
       + encodeURIComponent(roomId)
       + '#Intent;scheme=https;package=com.autotech.watchparty;S.browser_fallback_url='
-      + encodeURIComponent(PLAY_URL) + ';end';
+      + encodeURIComponent(webAppUrl(roomId)) + ';end';
   }
   window.openApp = function () {
     var r = getRoomId();
-    window.location.href = r ? buildIntent(r) : PLAY_URL;
+    var isAndroid = /Android/i.test(navigator.userAgent);
+    window.location.href = (r && isAndroid) ? buildIntent(r) : webAppUrl(r);
   };
   window.addEventListener('load', function () {
     var roomId = getRoomId();
@@ -505,13 +514,13 @@
       + '<span style="font-weight:800;letter-spacing:.12em;font-size:16px;">' + safeRoom + '</span>'
       + '</div>'
       + '<a id="wp-open-btn" href="#" style="display:block;background:linear-gradient(90deg,#2563eb,#06b6d4);color:#fff;font-weight:700;font-size:16px;text-decoration:none;padding:15px;border-radius:14px;margin-bottom:12px;">Open in WatchParty</a>'
-      + '<a href="' + PLAY_URL + '" style="display:block;color:#cbd5e1;font-size:13px;text-decoration:none;">No app yet? Get it on Google Play</a>'
+      + '<a href="' + webAppUrl(roomId) + '" style="display:block;color:#cbd5e1;font-size:13px;text-decoration:none;">No app? Join in your browser →</a>'
       + '</div>';
     document.body.appendChild(ov);
     document.body.style.overflow = 'hidden';
     document.getElementById('wp-open-btn').addEventListener('click', function (e) {
       e.preventDefault();
-      window.location.href = isAndroid ? buildIntent(roomId) : PLAY_URL;
+      window.location.href = isAndroid ? buildIntent(roomId) : webAppUrl(roomId);
     });
   });
 })();

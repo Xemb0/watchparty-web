@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Download WatchParty — Android, iOS &amp; Web</title>
+    <meta name="description" content="Download WatchParty for Android, join the iOS beta, or launch it instantly in your browser. Watch movies and videos together in perfect sync." />
+    <link rel="icon" type="image/png" href="https://kmngufxafbtfvdakcyjn.supabase.co/storage/v1/object/public/marketing/watchparty/watchparty_logo.png" />
+    <meta property="og:title" content="Download WatchParty" />
+    <meta property="og:description" content="Get WatchParty on Android, iOS, or launch it in your browser — watch together in sync." />
+    <meta property="og:image" content="https://kmngufxafbtfvdakcyjn.supabase.co/storage/v1/object/public/marketing/watchparty/feature_graphic.png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .gradient-text {
+        background: linear-gradient(45deg, #8b5cf6, #ec4899, #f59e0b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .glow-effect { box-shadow: 0 0 24px rgba(139, 92, 246, 0.35); }
+      .card-recommended {
+        outline: 2px solid rgba(167, 139, 250, 0.9);
+        outline-offset: 2px;
+        box-shadow: 0 0 28px rgba(139, 92, 246, 0.35);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-900 text-white overflow-x-hidden">
+    <!-- Top bar -->
+    <header class="sticky top-0 z-30 backdrop-blur-xl bg-gray-900/70 border-b border-white/10">
+      <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-2.5">
+          <img src="https://kmngufxafbtfvdakcyjn.supabase.co/storage/v1/object/public/marketing/watchparty/watchparty_logo.png"
+               alt="WatchParty" class="w-8 h-8 rounded-lg object-cover" />
+          <span class="font-bold text-lg">WatchParty</span>
+        </a>
+        <div class="flex items-center gap-3">
+          <a href="/" class="text-sm text-gray-300 hover:text-white transition-colors hidden sm:inline">Home</a>
+          <a href="/app/" class="text-sm font-semibold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-4 py-2 rounded-full transition-all">
+            🚀 Launch Web App
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="relative overflow-hidden bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+      <div class="max-w-4xl mx-auto px-6 py-16 lg:py-20 text-center relative z-10">
+        <img src="https://kmngufxafbtfvdakcyjn.supabase.co/storage/v1/object/public/marketing/watchparty/watchparty_logo.png"
+             alt="WatchParty logo" class="w-20 h-20 mx-auto mb-6 rounded-2xl glow-effect object-cover" />
+        <h1 class="text-4xl lg:text-6xl font-bold mb-4 leading-tight">
+          <span class="gradient-text">Get</span> WatchParty
+        </h1>
+        <p class="text-lg lg:text-xl text-gray-300 max-w-2xl mx-auto mb-8">
+          Watch movies and videos together, in perfect sync. Install the app on your phone —
+          or skip the download and <span class="text-white font-semibold">launch it right in your browser.</span>
+        </p>
+
+        <!-- Primary CTAs (the platform button is filled in by JS to match the visitor's device) -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <a id="primary-cta" href="/app/"
+             class="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-8 py-4 rounded-full font-bold text-white text-lg transform hover:scale-105 transition-all duration-300 glow-effect">
+            🚀 Launch Web App
+          </a>
+          <a id="secondary-cta" href="#platforms"
+             class="w-full sm:w-auto bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 px-8 py-4 rounded-full font-bold text-white text-lg transition-all">
+            ⬇️ See all downloads
+          </a>
+        </div>
+        <p id="detect-note" class="text-sm text-gray-400 mt-5"></p>
+      </div>
+    </section>
+
+    <!-- Platform grid -->
+    <section id="platforms" class="max-w-6xl mx-auto px-6 py-16">
+      <h2 class="text-2xl lg:text-3xl font-bold text-center mb-3">Choose your platform</h2>
+      <p class="text-gray-400 text-center mb-10 max-w-2xl mx-auto">
+        WatchParty runs everywhere. Mobile gets the native app; on desktop it runs instantly in your browser.
+      </p>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <!-- Android -->
+        <div id="card-android" class="flex flex-col bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-white/10">
+          <svg class="w-10 h-10 mb-4" viewBox="0 0 24 24" fill="#3DDC84"><path d="M17.523 15.341a1.001 1.001 0 1 1 0-2.002 1.001 1.001 0 0 1 0 2.002m-11.046 0a1.001 1.001 0 1 1 0-2.002 1.001 1.001 0 0 1 0 2.002m11.405-6.02 1.997-3.46a.416.416 0 0 0-.152-.567.416.416 0 0 0-.568.152l-2.022 3.503a12.331 12.331 0 0 0-5.137-1.103c-1.84 0-3.583.398-5.138 1.103L4.842 4.946a.416.416 0 0 0-.568-.152.416.416 0 0 0-.152.567l1.997 3.46C2.687 11.07.605 14.32.605 18.073h22.79c0-3.752-2.082-7.003-5.513-8.752"/></svg>
+          <h3 class="text-xl font-bold mb-1">Android</h3>
+          <p class="text-sm text-gray-400 mb-5 flex-1">Install the full native app directly — no Play Store needed.</p>
+          <a href="/Android/download"
+             class="block text-center bg-[#3DDC84] hover:bg-[#34c476] text-gray-900 font-bold px-4 py-3 rounded-xl transition-colors">
+            Download APK
+          </a>
+          <a href="#android-install" class="text-xs text-purple-300 hover:text-purple-200 text-center mt-3">How to install →</a>
+        </div>
+
+        <!-- iOS -->
+        <div id="card-ios" class="flex flex-col bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-white/10">
+          <svg class="w-10 h-10 mb-4" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg>
+          <h3 class="text-xl font-bold mb-1">iPhone &amp; iPad</h3>
+          <p class="text-sm text-gray-400 mb-5 flex-1">The iOS app is in beta. Grab a TestFlight invite while we finish App Store review.</p>
+          <a href="/#ios-beta"
+             class="block text-center bg-white text-gray-900 font-bold px-4 py-3 rounded-xl hover:bg-gray-200 transition-colors">
+            Join the iOS Beta
+          </a>
+          <span class="text-xs text-gray-500 text-center mt-3">App Store — coming soon</span>
+        </div>
+
+        <!-- Windows -->
+        <div id="card-windows" class="flex flex-col bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-white/10">
+          <svg class="w-10 h-10 mb-4" viewBox="0 0 24 24" fill="#41A5EE"><path d="M0 3.449 9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+          <h3 class="text-xl font-bold mb-1">Windows</h3>
+          <p class="text-sm text-gray-400 mb-5 flex-1">No install needed — WatchParty runs in your browser. Add it to your taskbar in one click.</p>
+          <a href="/Windows/download"
+             class="block text-center bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold px-4 py-3 rounded-xl transition-all">
+            Open Web App
+          </a>
+          <span class="text-xs text-gray-500 text-center mt-3">Then “Install” from your browser menu</span>
+        </div>
+
+        <!-- macOS -->
+        <div id="card-macos" class="flex flex-col bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 border border-white/10">
+          <svg class="w-10 h-10 mb-4" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"/></svg>
+          <h3 class="text-xl font-bold mb-1">macOS</h3>
+          <p class="text-sm text-gray-400 mb-5 flex-1">No install needed — WatchParty runs in your browser. Add it to your Dock in one click.</p>
+          <a href="/MacOS/download"
+             class="block text-center bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold px-4 py-3 rounded-xl transition-all">
+            Open Web App
+          </a>
+          <span class="text-xs text-gray-500 text-center mt-3">Then “Install” from your browser menu</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Android install instructions -->
+    <section id="android-install" class="max-w-3xl mx-auto px-6 py-12">
+      <div class="bg-white/[0.03] border border-white/10 rounded-3xl p-8">
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">📱 Installing the Android APK</h2>
+        <ol class="space-y-4 text-gray-300">
+          <li class="flex gap-3"><span class="flex-none w-7 h-7 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center text-sm">1</span><span>Tap <strong>Download APK</strong> above and let the file finish downloading.</span></li>
+          <li class="flex gap-3"><span class="flex-none w-7 h-7 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center text-sm">2</span><span>Open the downloaded <code class="bg-gray-800 px-1.5 py-0.5 rounded text-purple-300">watchparty.apk</code> file.</span></li>
+          <li class="flex gap-3"><span class="flex-none w-7 h-7 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center text-sm">3</span><span>If Android asks, allow <strong>“Install unknown apps”</strong> for your browser or Files app — this is normal for apps installed outside the Play Store.</span></li>
+          <li class="flex gap-3"><span class="flex-none w-7 h-7 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center text-sm">4</span><span>Tap <strong>Install</strong>, then <strong>Open</strong> — and start a watch party. 🎬</span></li>
+        </ol>
+        <p class="text-xs text-gray-500 mt-6">
+          Prefer not to install anything? You can always
+          <a href="/app/" class="text-purple-300 hover:text-purple-200 underline underline-offset-2">use WatchParty in your browser</a> instead.
+        </p>
+      </div>
+    </section>
+
+    <!-- Web app callout -->
+    <section class="max-w-5xl mx-auto px-6 pb-20">
+      <div class="bg-gradient-to-r from-purple-900/60 to-pink-900/60 rounded-3xl p-10 text-center border border-purple-500/25">
+        <div class="text-4xl mb-3">🌐</div>
+        <h2 class="text-2xl lg:text-3xl font-bold mb-3">Don’t want to download anything?</h2>
+        <p class="text-gray-300 max-w-2xl mx-auto mb-7">
+          WatchParty runs fully in your browser — on any computer, no install required. Create a room and
+          send your friends a link in seconds.
+        </p>
+        <a href="/app/"
+           class="inline-block bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-10 py-4 rounded-full font-bold text-white text-lg transform hover:scale-105 transition-all duration-300 glow-effect">
+          🚀 Launch Web App
+        </a>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black/50 backdrop-blur-sm border-t border-gray-800 py-10">
+      <div class="max-w-6xl mx-auto px-6 text-center">
+        <div class="flex flex-wrap justify-center gap-6 text-sm mb-6">
+          <a href="/" class="text-purple-400 hover:text-purple-300 transition-colors">Home</a>
+          <a href="/app/" class="text-purple-400 hover:text-purple-300 transition-colors">Web App</a>
+          <a href="privacy-policy.html" class="text-purple-400 hover:text-purple-300 transition-colors">Privacy Policy</a>
+          <a href="terms-of-service.html" class="text-purple-400 hover:text-purple-300 transition-colors">Terms of Service</a>
+          <a href="contact.html" class="text-purple-400 hover:text-purple-300 transition-colors">Contact Us</a>
+          <a href="https://imautotech.in/support/?product=watchparty" class="text-purple-400 hover:text-purple-300 transition-colors">Help Center</a>
+        </div>
+        <p class="text-gray-500 text-sm">© 2025 WatchParty by Imautotech — Bringing people together through shared experiences</p>
+      </div>
+    </footer>
+
+    <script>
+      // Highlight the download that matches the visitor's device and point the
+      // hero's primary button at it. Everything still works with JS disabled —
+      // this only adds a "recommended for you" hint on top of the static cards.
+      (function () {
+        var ua = navigator.userAgent || '';
+        var APK = '/Android/download';
+        var WEB = '/app/';
+        var IOS = '/#ios-beta';
+
+        var plat = 'web';
+        if (/android/i.test(ua)) plat = 'android';
+        else if (/iphone|ipad|ipod/i.test(ua) ||
+                 (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) plat = 'ios';
+        else if (/windows/i.test(ua)) plat = 'windows';
+        else if (/macintosh|mac os x/i.test(ua)) plat = 'macos';
+
+        var cta = document.getElementById('primary-cta');
+        var note = document.getElementById('detect-note');
+        var map = {
+          android: { href: APK, label: '📱 Download Android APK', note: 'Detected Android — the native app is recommended for you.' },
+          ios:     { href: IOS, label: '🍎 Join the iOS Beta',     note: 'Detected iPhone/iPad — request a TestFlight invite, or launch the web app below.' },
+          windows: { href: WEB, label: '🚀 Launch Web App',        note: 'Detected Windows — WatchParty runs right in your browser.' },
+          macos:   { href: WEB, label: '🚀 Launch Web App',        note: 'Detected macOS — WatchParty runs right in your browser.' },
+          web:     { href: WEB, label: '🚀 Launch Web App',        note: 'Launch WatchParty instantly in your browser — no download needed.' }
+        };
+        var pick = map[plat];
+        if (cta) { cta.href = pick.href; cta.textContent = pick.label; }
+        if (note) { note.textContent = pick.note; }
+
+        var card = document.getElementById('card-' + plat);
+        if (card) { card.classList.add('card-recommended'); }
+      })();
+    </script>
+  </body>
+</html>

@@ -68,3 +68,61 @@
   from = "/app/*"
   to = "/app/index.html"
   status = 200
+
+# ── Download / launch shortcuts ─────────────────────────────────────────────
+# Memorable per-platform URLs that the marketing site, app menus, and shared
+# links point at. Path matching is case-sensitive, so each has a lowercase
+# alias too (people type both /Android/download and /android/download).
+#
+#   /download            → the platform-picker hub page (download.html)
+#   /Android/download    → the latest Android APK (GitHub Release asset)
+#   /Windows + /MacOS    → the in-browser web app (no native desktop build)
+#
+# Android APK lives as a GitHub Release asset on the PUBLIC, releases-only repo
+# `Xemb0/watchparty-app` (the app source stays private). The
+# `releases/latest/download/<asset>` URL always resolves to the newest build,
+# so the site never needs editing when a new APK ships — just publish a release
+# there with the asset named `watchparty.apk`.
+[[redirects]]
+  from = "/Android/download"
+  to = "https://github.com/Xemb0/watchparty-app/releases/latest/download/watchparty.apk"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/android/download"
+  to = "https://github.com/Xemb0/watchparty-app/releases/latest/download/watchparty.apk"
+  status = 302
+  force = true
+
+# macOS / Windows have no native build — WatchParty runs in the browser.
+[[redirects]]
+  from = "/MacOS/download"
+  to = "/app/"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/macos/download"
+  to = "/app/"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/Windows/download"
+  to = "/app/"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "/windows/download"
+  to = "/app/"
+  status = 302
+  force = true
+
+# Download hub. Netlify already serves download.html at /download via pretty
+# URLs; this makes it explicit and guaranteed.
+[[redirects]]
+  from = "/download"
+  to = "/download.html"
+  status = 200
