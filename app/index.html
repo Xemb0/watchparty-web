@@ -946,6 +946,41 @@
     color: rgba(255,255,255,0.85); width: 28px; height: 28px; border-radius: 14px; font-size: 16px;
   }
 </style>
+<!-- "Get the native app" pill — links web users to the download page.
+     Absolute URL so it works on watchparty.online/app/ AND app.watchparty.online. -->
+<a id="wpGetApp" href="https://watchparty.online/download" target="_blank" rel="noopener"
+   style="position:fixed; top:max(10px, env(safe-area-inset-top)); left:50%; transform:translateX(-50%);
+          z-index:9998; display:none; align-items:center; gap:8px;
+          background:rgba(20,18,40,.85); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
+          border:1px solid rgba(167,139,250,.5); color:#fff;
+          font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; font-size:13px; font-weight:600;
+          padding:7px 10px 7px 14px; border-radius:999px; text-decoration:none;
+          box-shadow:0 6px 20px rgba(0,0,0,.35);">
+  <span>📱 Get the app</span>
+  <span id="wpGetAppClose" role="button" aria-label="Dismiss"
+        style="width:18px; height:18px; line-height:18px; text-align:center;
+               border-radius:50%; background:rgba(255,255,255,.14); font-weight:700; font-size:14px;">&times;</span>
+</a>
+<script>
+  (function () {
+    var KEY = 'wp_getapp_dismissed';
+    var el = document.getElementById('wpGetApp');
+    var x = document.getElementById('wpGetAppClose');
+    function isStandalone() {
+      return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    }
+    var dismissed = false;
+    try { dismissed = sessionStorage.getItem(KEY) === '1'; } catch (e) {}
+    // Show after a beat so it appears over the app, not the loading screen.
+    if (!isStandalone() && !dismissed) setTimeout(function () { el.style.display = 'inline-flex'; }, 1500);
+    x.addEventListener('click', function (e) {
+      e.preventDefault(); e.stopPropagation();
+      try { sessionStorage.setItem(KEY, '1'); } catch (e2) {}
+      el.style.display = 'none';
+    });
+  })();
+</script>
+
 <div id="wpInstallBanner">
   <img src="/app/icons/icon-192.png" alt="WatchParty">
   <div class="wp-txt">

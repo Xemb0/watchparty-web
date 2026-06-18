@@ -59,6 +59,26 @@
   [headers.values]
     Cache-Control = "public, max-age=86400"
 
+# ── app.watchparty.online → launch the WEB APP at the subdomain root ─────────
+# app.watchparty.online is a domain alias of THIS Netlify site, so by default it
+# mirrors the marketing site. Instead, serve the compiled web app (which lives
+# under /app/) at the subdomain's root. The app's HTML uses root-absolute
+# /app/... asset paths, so:
+#   • requests for /app/* (js, wasm, manifest, icons, SW) pass straight through
+#     to the real files — this guard stops the force-rewrite below eating them;
+#   • everything else on this host serves the app shell (/app/index.html).
+# watchparty.online is a different host, so these rules never affect it.
+[[redirects]]
+  from = "https://app.watchparty.online/app/*"
+  to = "/app/:splat"
+  status = 200
+
+[[redirects]]
+  from = "https://app.watchparty.online/*"
+  to = "/app/index.html"
+  status = 200
+  force = true
+
 # ── SPA fallback for the Compose client-side router: any deep URL under
 #    /app (e.g. /app/room/ABCD) serves the app's index.html so refresh +
 #    deep links resolve instead of 404. status 200 = rewrite, not redirect.
