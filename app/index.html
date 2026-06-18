@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>WatchParty</title>
 
+    <!-- Google AdSense — Auto ads loader. Placement (anchor / vignette) is
+         controlled in the AdSense dashboard for this site; the app surface is a
+         single <canvas>, so page-level Auto ads (esp. the bottom anchor banner)
+         are what actually render here. Ownership is asserted via /ads.txt at the
+         domain root. -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7821269051534446"
+            crossorigin="anonymous"></script>
+
     <!-- UI-language bootstrap: Compose-Multiplatform has no public runtime locale
          override on web (CMP-8376), and it reads navigator.language ONCE at wasm
          init. So BEFORE the wasm loads, read the user's chosen language (the
