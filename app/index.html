@@ -414,6 +414,122 @@
     };
 </script>
 
+<!-- Avatar cropper — circular framing overlay (pure DOM, above the Compose
+     canvas). Lets the user pan + zoom to frame their face before upload; outputs
+     a 512×512 square JPEG dataURL's base64 (the app clips avatars to a circle on
+     display). onDone(base64) on confirm, onDone(null) on cancel/error. -->
+<script>
+    window.__wp_cropAvatar = function(file, onDone) {
+        var done = false;
+        function finish(v) { if (done) return; done = true; onDone(v); }
+        try {
+            var url = URL.createObjectURL(file);
+            var img = new Image();
+            img.onerror = function(){ try{URL.revokeObjectURL(url);}catch(e){} finish(null); };
+            img.onload = function() {
+                var DISP = Math.max(200, Math.min(window.innerWidth, window.innerHeight, 420) - 48);
+
+                var ov = document.createElement('div');
+                ov.style.cssText = 'position:fixed;inset:0;z-index:2147483600;background:rgba(8,6,14,0.94);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;font-family:system-ui,-apple-system,sans-serif;padding:20px;box-sizing:border-box;';
+
+                var title = document.createElement('div');
+                title.textContent = 'Move and zoom to frame your face';
+                title.style.cssText = 'color:#fff;font-size:15px;font-weight:600;text-align:center;';
+
+                var wrap = document.createElement('div');
+                wrap.style.cssText = 'position:relative;width:' + DISP + 'px;height:' + DISP + 'px;touch-action:none;border-radius:16px;overflow:hidden;background:#000;';
+                var canvas = document.createElement('canvas');
+                canvas.width = DISP; canvas.height = DISP;
+                canvas.style.cssText = 'width:100%;height:100%;display:block;cursor:grab;';
+                wrap.appendChild(canvas);
+                var mask = document.createElement('div');
+                mask.style.cssText = 'position:absolute;inset:0;pointer-events:none;border-radius:50%;outline:2px solid rgba(255,255,255,0.9);box-shadow:0 0 0 9999px rgba(8,6,14,0.55);';
+                wrap.appendChild(mask);
+
+                var slider = document.createElement('input');
+                slider.type = 'range'; slider.min = '1'; slider.max = '4'; slider.step = '0.01'; slider.value = '1';
+                slider.style.cssText = 'width:' + DISP + 'px;max-width:90vw;accent-color:#8B5CF6;';
+
+                var btnRow = document.createElement('div');
+                btnRow.style.cssText = 'display:flex;gap:12px;width:' + DISP + 'px;max-width:90vw;';
+                var cancel = document.createElement('button');
+                cancel.textContent = 'Cancel';
+                cancel.style.cssText = 'flex:1;height:46px;border-radius:12px;border:1px solid rgba(255,255,255,0.25);background:transparent;color:#fff;font-size:15px;font-weight:600;cursor:pointer;';
+                var ok = document.createElement('button');
+                ok.textContent = 'Use photo';
+                ok.style.cssText = 'flex:1;height:46px;border-radius:12px;border:none;background:#8B5CF6;color:#fff;font-size:15px;font-weight:700;cursor:pointer;';
+                btnRow.appendChild(cancel); btnRow.appendChild(ok);
+
+                ov.appendChild(title); ov.appendChild(wrap); ov.appendChild(slider); ov.appendChild(btnRow);
+                document.body.appendChild(ov);
+
+                var ctx = canvas.getContext('2d');
+                var iw = img.naturalWidth, ih = img.naturalHeight;
+                var minScale = DISP / Math.min(iw, ih);  // "cover" the square
+                var scale = minScale;
+                var ox = (DISP - iw * scale) / 2;
+                var oy = (DISP - ih * scale) / 2;
+
+                function clamp() {
+                    if (ox > 0) ox = 0;
+                    if (oy > 0) oy = 0;
+                    if (ox < DISP - iw * scale) ox = DISP - iw * scale;
+                    if (oy < DISP - ih * scale) oy = DISP - ih * scale;
+                }
+                function draw() {
+                    ctx.clearRect(0, 0, DISP, DISP);
+                    ctx.drawImage(img, ox, oy, iw * scale, ih * scale);
+                }
+                clamp(); draw();
+
+                slider.addEventListener('input', function() {
+                    var ns = minScale * parseFloat(slider.value);
+                    var c = DISP / 2;
+                    ox = c - (c - ox) * (ns / scale);
+                    oy = c - (c - oy) * (ns / scale);
+                    scale = ns; clamp(); draw();
+                });
+
+                var dragging = false, lastX = 0, lastY = 0;
+                function onMove(x, y) { if (!dragging) return; ox += (x - lastX); oy += (y - lastY); lastX = x; lastY = y; clamp(); draw(); }
+                function mDown(e) { dragging = true; lastX = e.clientX; lastY = e.clientY; canvas.style.cursor = 'grabbing'; }
+                function mMove(e) { onMove(e.clientX, e.clientY); }
+                function mUp() { dragging = false; canvas.style.cursor = 'grab'; }
+                function tStart(e) { if (e.touches[0]) { dragging = true; lastX = e.touches[0].clientX; lastY = e.touches[0].clientY; } }
+                function tMove(e) { if (e.touches[0]) { onMove(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); } }
+                function tEnd() { dragging = false; }
+                canvas.addEventListener('mousedown', mDown);
+                window.addEventListener('mousemove', mMove);
+                window.addEventListener('mouseup', mUp);
+                canvas.addEventListener('touchstart', tStart, { passive: true });
+                canvas.addEventListener('touchmove', tMove, { passive: false });
+                canvas.addEventListener('touchend', tEnd);
+
+                function cleanup() {
+                    window.removeEventListener('mousemove', mMove);
+                    window.removeEventListener('mouseup', mUp);
+                    try { document.body.removeChild(ov); } catch (e) {}
+                    try { URL.revokeObjectURL(url); } catch (e) {}
+                }
+                cancel.addEventListener('click', function() { cleanup(); finish(null); });
+                ok.addEventListener('click', function() {
+                    try {
+                        var OUT = 512;
+                        var out = document.createElement('canvas'); out.width = OUT; out.height = OUT;
+                        var octx = out.getContext('2d');
+                        var sx = (0 - ox) / scale, sy = (0 - oy) / scale, sd = DISP / scale;
+                        octx.drawImage(img, sx, sy, sd, sd, 0, 0, OUT, OUT);
+                        var dataUrl = out.toDataURL('image/jpeg', 0.9);
+                        var b64 = dataUrl.substring(dataUrl.indexOf(',') + 1);
+                        cleanup(); finish(b64);
+                    } catch (e) { console.error('[WP-IMG] crop failed', e); cleanup(); finish(null); }
+                });
+            };
+            img.src = url;
+        } catch (e) { console.error('[WP-IMG] cropper error', e); finish(null); }
+    };
+</script>
+
 <!-- RevenueCat Web Billing SDK — DISABLED on web for now.
      The previous unpkg URL (purchases-js@1) 404'd because the package's
      dist layout changed upstream, and trying to load a 404'd JS file
