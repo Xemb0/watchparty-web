@@ -49,13 +49,29 @@
     <meta name="apple-mobile-web-app-title" content="WatchParty">
     <link rel="apple-touch-icon" sizes="180x180" href="/app/icons/apple-touch-icon.png">
     <style>
-        html, body {
+        html {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
             overflow: hidden;
+            /* App background lives on <html> (the root canvas background). It
+               shows wherever the Compose canvas is transparent. */
             background-color: #1a1a2e;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            /* MUST stay transparent: the behind-canvas video player
+               (DevFlags.webPlayerBehindCanvas) sits at z-index:-1, and a <body>
+               background box paints ABOVE negative-z children — an opaque body
+               bg here hides the video, so the canvas hole would reveal the body
+               colour instead of the playing iframe. Keep the app colour on
+               <html> only. */
+            background-color: transparent;
         }
         #composeTarget {
             width: 100%;
@@ -764,10 +780,18 @@
             window.__wp_lk_pendingMic = null;
             return true;
         }
-        catch (e) { console.error('[WP-LK] setMicEnabled failed:', e); throw e; }
+        catch (e) {
+            // Latch the reason (name + message) so the Kotlin side can surface
+            // WHY the mic didn't turn on (permission denied / device busy / …),
+            // mirroring the camera path. Then rethrow so the await rejects.
+            console.error('[WP-LK] setMicEnabled failed:', e);
+            window.__wp_lk_lastMicError = (e && e.name ? e.name + ': ' : '') + (e && e.message ? e.message : 'microphone failed');
+            throw e;
+        }
     };
 
     window.__wp_lk_lastCameraError = '';
+    window.__wp_lk_lastMicError = '';
     window.__wp_lk_pendingCamera = null;
     window.__wp_lk_pendingMic = null;
 
