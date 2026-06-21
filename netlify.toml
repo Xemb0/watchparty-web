@@ -79,6 +79,38 @@
   status = 200
   force = true
 
+# ── Canonicalize the web app to ONE URL: app.watchparty.online ───────────────
+# The marketing domains used to ALSO serve a copy of the web app at /app/.
+# Redirect those to the canonical subdomain instead (strip the /app prefix, so a
+# deep route like /app/room/ABCD → app.watchparty.online/room/ABCD). Host-specific
+# `from` (full URL) so app.watchparty.online itself is NEVER matched here — it
+# keeps serving the app via the two rules above. 302 (temporary) for now so it's
+# reversible; promote to 301 once confirmed. Placed BEFORE the generic /app/*
+# SPA fallback below so these win (first match wins, in file order).
+[[redirects]]
+  from = "https://watchparty.online/app"
+  to = "https://app.watchparty.online/"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "https://watchparty.online/app/*"
+  to = "https://app.watchparty.online/:splat"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "https://watchparty.imautotech.in/app"
+  to = "https://app.watchparty.online/"
+  status = 302
+  force = true
+
+[[redirects]]
+  from = "https://watchparty.imautotech.in/app/*"
+  to = "https://app.watchparty.online/:splat"
+  status = 302
+  force = true
+
 # ── SPA fallback for the Compose client-side router: any deep URL under
 #    /app (e.g. /app/room/ABCD) serves the app's index.html so refresh +
 #    deep links resolve instead of 404. status 200 = rewrite, not redirect.
