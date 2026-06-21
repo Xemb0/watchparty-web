@@ -30,6 +30,18 @@
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
 
+# ── App ENTRY (watchparty.js): no-store, not just revalidate. It carries the
+#    content-hashed .wasm filename, and each deploy's rsync --delete removes the
+#    PREVIOUS wasm. A browser that reuses a cached watchparty.js (must-revalidate
+#    isn't always honoured — bfcache, etc.) then requests a wasm that no longer
+#    exists → 404 → SPA-fallback HTML → the app boots to "Unexpected token '<'"
+#    / just spins. no-store guarantees the entry is always fresh, so it always
+#    points at the CURRENT wasm. Placed after /app/*.js so this value wins. ──
+[[headers]]
+  for = "/app/watchparty.js"
+  [headers.values]
+    Cache-Control = "no-store, no-cache, must-revalidate"
+
 # ── App entry point must always refresh on redeploy ──
 [[headers]]
   for = "/app/index.html"
