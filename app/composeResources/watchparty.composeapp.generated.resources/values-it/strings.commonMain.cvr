@@ -299,7 +299,7 @@ string|hosthome_dismiss|SWdub3Jh
 string|hosthome_upload_to_drive|Q2FyaWNhIHN1IERyaXZlIGUgY29uZGl2aWRp
 string|hosthome_uploaded_done|4pyTIENhcmljYXRvIOKAlCBGYXR0bw==
 string|hosthome_uploaded_share_link|4pyTIENhcmljYXRvIOKAlCBDb25kaXZpZGkgbGluaw==
-string|hosthome_uploading_progress|Q2FyaWNhbWVudG/igKYgJTEkZCUl
+string|hosthome_uploading_progress|Q2FyaWNhbWVudG/igKYgJTEkcw==
 string|joinroom_accept|QWNjZXR0YQ==
 string|joinroom_createInstead|Q3JlYSBpbnZlY2U=
 string|joinroom_decline|UmlmaXV0YQ==
@@ -598,7 +598,7 @@ string|roomscreen_upload_gallery_back|VG9ybmEgYWxsZSBzb3JnZW50aQ==
 string|roomscreen_uploaded_done|4pyTIENhcmljYXRvIOKAlCBGYXR0bw==
 string|roomscreen_uploaded_share_link|4pyTIENhcmljYXRvIOKAlCBDb25kaXZpZGkgbGluaw==
 string|roomscreen_uploaded_videos_in_room|VmlkZW8gY2FyaWNhdGkgaW4gcXVlc3RhIHN0YW56YQ==
-string|roomscreen_uploading_progress|Q2FyaWNhbWVudG/igKYgJTEkZCUl
+string|roomscreen_uploading_progress|Q2FyaWNhbWVudG/igKYgJTEkcw==
 string|roomscreen_watch_party_default_name|V2F0Y2ggUGFydHk=
 string|roomscreen_what_to_do_with_video|Q29zYSBmYXJlIGNvbiBxdWVzdG8gdmlkZW8/
 string|roomtopbar_change_video_description|Q2FtYmlhIHZpZGVv
