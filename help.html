@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WatchParty — Help &amp; FAQ</title>
+    <meta name="description" content="WatchParty help and frequently asked questions — rooms, invites, subscriptions, account settings, and live support." />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .gradient-text {
+        background: linear-gradient(45deg, #8b5cf6, #ec4899, #f59e0b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      details > summary { cursor: pointer; list-style: none; }
+      details > summary::-webkit-details-marker { display: none; }
+      details[open] summary .chev { transform: rotate(90deg); }
+    </style>
+  </head>
+  <body class="bg-gray-900 text-white">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-purple-900 via-blue-900 to-indigo-900 py-8 px-6 md:px-20">
+      <div class="max-w-3xl mx-auto">
+        <a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+          <div>
+            <h1 class="text-2xl md:text-3xl font-bold gradient-text">WatchParty</h1>
+            <p class="text-gray-400 text-sm">Help &amp; FAQ</p>
+          </div>
+        </a>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="max-w-3xl mx-auto px-6 py-12">
+      <h2 class="text-2xl font-bold mb-2">Frequently asked questions</h2>
+      <p class="text-lg text-gray-300 mb-8">Quick answers to common questions. Still stuck? Chat with our team at the bottom of this page.</p>
+
+      <div class="space-y-3 mb-12">
+        <details class="bg-gray-800 border border-gray-700 rounded-lg p-5">
+          <summary class="flex items-center justify-between font-semibold text-purple-300"><span>What is WatchParty?</span><span class="chev text-purple-400 transition-transform">&rsaquo;</span></summary>
+          <p class="text-gray-400 mt-3">WatchParty lets you watch videos together in perfect sync with friends and family, with live voice and video chat so it feels like you're in the same room.</p>
+        </details>
+
+        <details class="bg-gray-800 border border-gray-700 rounded-lg p-5">
+          <summary class="flex items-center justify-between font-semibold text-purple-300"><span>How do I create a room and invite friends?</span><span class="chev text-purple-400 transition-transform">&rsaquo;</span></summary>
+          <p class="text-gray-400 mt-3">Tap <strong>Create Room</strong> on the home screen, pick or paste a video, then share the room's invite link or code. Anyone who opens it joins your synced session.</p>
+        </details>
+
+        <details class="bg-gray-800 border border-gray-700 rounded-lg p-5">
+          <summary class="flex items-center justify-between font-semibold text-purple-300"><span>Is WatchParty free?</span><span class="chev text-purple-400 transition-transform">&rsaquo;</span></summary>
+          <p class="text-gray-400 mt-3">Yes — the core experience is free. <strong>Premium</strong> raises limits (more participants per room, higher video quality, longer daily watch time, more friends) and removes ads.</p>
+        </details>
+
+        <details class="bg-gray-800 border border-gray-700 rounded-lg p-5">
+          <summary class="flex items-center justify-between font-semibold text-purple-300"><span>How do I manage or cancel my subscription?</span><span class="chev text-purple-400 transition-transform">&rsaquo;</span></summary>
+          <p class="text-gray-400 mt-3">Subscriptions are billed through your app store. On iPhone/iPad: <strong>Settings → your name → Subscriptions</strong>. On Android: <strong>Play Store → Subscriptions</strong>. You can also open <strong>Manage Subscription</strong> from the app's profile screen. Cancelling stops future renewals; Premium stays active until the period ends.</p>
+        </details>
+
+        <details class="bg-gray-800 border border-gray-700 rounded-lg p-5">
+          <summary class="flex items-center justify-between font-semibold text-purple-300"><span>How do I delete my account?</span><span class="chev text-purple-400 transition-transform">&rsaquo;</span></summary>
+          <p class="text-gray-400 mt-3">Open the app, go to <strong>Profile → Delete Account</strong>, and confirm. This permanently deletes your account and associated data. You can also request deletion via <a href="/support" class="text-pink-400 hover:underline">support</a>.</p>
+        </details>
+
+        <details class="bg-gray-800 border border-gray-700 rounded-lg p-5">
+          <summary class="flex items-center justify-between font-semibold text-purple-300"><span>Video won't play or is out of sync</span><span class="chev text-purple-400 transition-transform">&rsaquo;</span></summary>
+          <p class="text-gray-400 mt-3">Check your internet connection, make sure everyone is on the latest app version, and try leaving and rejoining the room. Some sources can't be shared due to their own restrictions — try a different video or link.</p>
+        </details>
+
+        <details class="bg-gray-800 border border-gray-700 rounded-lg p-5">
+          <summary class="flex items-center justify-between font-semibold text-purple-300"><span>Camera or microphone isn't working</span><span class="chev text-purple-400 transition-transform">&rsaquo;</span></summary>
+          <p class="text-gray-400 mt-3">Make sure you granted camera/microphone permission when prompted. You can enable it later in your device settings under the WatchParty app, then reopen the room.</p>
+        </details>
+      </div>
+
+      <!-- Live support chat (same team/inbox as the app) -->
+      <h2 class="text-2xl font-bold text-purple-400 mb-3">Still need help?</h2>
+      <p class="text-gray-300 mb-5">Chat with our support team — the same team that answers inside the app.</p>
+      <section class="mb-6">
+        <div id="wp-support-chat"></div>
+      </section>
+      <p class="text-gray-500 text-sm">Prefer email? <a href="mailto:imautotech.support@gmail.com" class="text-pink-400 hover:underline">imautotech.support@gmail.com</a> — we reply within 24–48 hours.</p>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-950 text-white py-6 text-center border-t border-gray-800">
+      <p class="text-gray-500 text-sm">&copy; 2025 WatchParty by Imautotech. All rights reserved.</p>
+      <div class="mt-2 space-x-4">
+        <a href="/" class="text-purple-400 hover:underline text-sm">Home</a>
+        <a href="/support" class="text-purple-400 hover:underline text-sm">Support</a>
+        <a href="/privacy-policy.html" class="text-purple-400 hover:underline text-sm">Privacy Policy</a>
+        <a href="/terms-of-service.html" class="text-purple-400 hover:underline text-sm">Terms of Service</a>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/js/support-chat.js" defer></script>
+  </body>
+</html>

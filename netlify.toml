@@ -190,3 +190,17 @@
   from = "/download"
   to = "/download.html"
   status = 200
+
+# ── Support & Help ──────────────────────────────────────────────────────────
+# /support is the App Store / Play "Support URL". Both pages embed a live chat
+# widget wired to the SAME dedicated support backend + tables the mobile app's
+# in-app Support Console uses, so web and app messages share one agent inbox.
+[[redirects]]
+  from = "/support"
+  to = "/support.html"
+  status = 200
+
+[[redirects]]
+  from = "/help"
+  to = "/help.html"
+  status = 200
