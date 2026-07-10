@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.autotech.watchparty",
+    "sha256_cert_fingerprints": [
+      "4C:D3:F7:11:97:3B:AF:4B:A3:35:07:C3:67:00:4D:A6:F2:FC:1A:0C:28:98:E6:B9:4B:2D:FA:73:B5:60:7E:F8"
+    ]
+  }
+}]

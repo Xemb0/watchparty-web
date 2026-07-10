@@ -1,0 +1,12 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": ["9P2QF6P7W9.com.autotech.watchparty.ios"],
+        "appID": "9P2QF6P7W9.com.autotech.watchparty.ios",
+        "paths": ["/join", "/join*", "/join/*"]
+      }
+    ]
+  }
+}

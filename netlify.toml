@@ -6,6 +6,21 @@
   # Static site — nothing to build, just publish the repo root.
   publish = "."
 
+# ── iOS Universal Links: the AASA file is extension-less, so Netlify would
+#    serve it as application/octet-stream; Apple's CDN requires JSON. Never
+#    cache-pin it — Apple re-fetches on its own schedule. ──
+[[headers]]
+  for = "/.well-known/apple-app-site-association"
+  [headers.values]
+    Content-Type = "application/json"
+    Cache-Control = "public, max-age=300"
+
+[[headers]]
+  for = "/.well-known/assetlinks.json"
+  [headers.values]
+    Content-Type = "application/json"
+    Cache-Control = "public, max-age=300"
+
 # ── WASM: serve with the correct MIME so the browser streaming-compiles it
 #    instead of failing with "Incorrect response MIME type" ──
 [[headers]]
@@ -189,6 +204,15 @@
 [[redirects]]
   from = "/download"
   to = "/download.html"
+  status = 200
+
+# ── Room invites: /join?roomId=… ────────────────────────────────────────────
+# Installed apps intercept this URL via Universal/App Links (the .well-known
+# association files above) and never reach the site. Browsers land on the
+# fallback page, which forwards into the web app with the roomId intact.
+[[redirects]]
+  from = "/join"
+  to = "/join/index.html"
   status = 200
 
 # ── Support & Help ──────────────────────────────────────────────────────────
