@@ -5,13 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>WatchParty</title>
 
-    <!-- Google AdSense — Auto ads loader. Placement (anchor / vignette) is
-         controlled in the AdSense dashboard for this site; the app surface is a
-         single <canvas>, so page-level Auto ads (esp. the bottom anchor banner)
-         are what actually render here. Ownership is asserted via /ads.txt at the
-         domain root. -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7821269051534446"
-            crossorigin="anonymous"></script>
+    <!-- Google AdSense removed — this surface is a single <canvas> with no
+         publisher content, so page-level ads violate AdSense policy. -->
+
 
     <!-- UI-language bootstrap: Compose-Multiplatform has no public runtime locale
          override on web (CMP-8376), and it reads navigator.language ONCE at wasm
@@ -570,42 +566,12 @@
     window.__wp_rc_getCustomerInfo = async function() { return null; };
 </script>
 
-<!-- In-app AdSense display banner — earns while a user is in a watch party.
-     Reserves a bottom strip (shrinks the canvas) so it NEVER overlaps the player
-     or controls; restores full height when hidden. Inert until a real Display
-     ad-unit slot id is wired (WP_INAPP_AD_SLOT, passed from wasm): with no slot
-     it is a pure no-op, so the in-room layout is unchanged until ads are set up. -->
-<div id="wp-ad-inapp" style="position: fixed; left: 0; right: 0; bottom: 0; height: 0; overflow: hidden; z-index: 2147483000; background: #0d0a14; display: flex; align-items: center; justify-content: center; transition: height .15s ease;">
-    <ins class="adsbygoogle"
-         style="display:inline-block; width:320px; height:50px;"
-         data-ad-client="ca-pub-7821269051534446"
-         data-ad-slot=""></ins>
-</div>
+<!-- In-app AdSense banner removed (AdSense disabled on the web app to comply
+     with the "no publisher content" policy for canvas surfaces). The wasm
+     bridge still calls window.__wp_setInAppAd(...), so keep it as a safe no-op
+     that never reserves space — the canvas always stays full-height. -->
 <script>
-(function () {
-    var AD_H = 56, pushed = false;
-    // show: boolean — reserve the strip + render the ad.
-    // slot: AdSense Display ad-unit id ('' or a *SLOT* placeholder = disabled).
-    window.__wp_setInAppAd = function (show, slot) {
-        var bar = document.getElementById('wp-ad-inapp');
-        var ct = document.getElementById('composeTarget');
-        if (!bar || !ct) return;
-        var hasSlot = !!slot && slot.length >= 6 && slot.indexOf('SLOT') === -1;
-        if (show && hasSlot) {
-            var ins = bar.querySelector('ins.adsbygoogle');
-            if (ins && ins.getAttribute('data-ad-slot') !== slot) ins.setAttribute('data-ad-slot', slot);
-            bar.style.height = AD_H + 'px';
-            ct.style.height = 'calc(100% - ' + AD_H + 'px)';
-            if (!pushed) {
-                try { (adsbygoogle = window.adsbygoogle || []).push({}); pushed = true; }
-                catch (e) { console.warn('[WP-AD] push failed', e); }
-            }
-        } else {
-            bar.style.height = '0px';
-            ct.style.height = '100%';
-        }
-    };
-})();
+window.__wp_setInAppAd = function () {};
 </script>
 
 <!-- Exit guard: ask before the user leaves the app (tab close / refresh /
