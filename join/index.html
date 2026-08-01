@@ -12,8 +12,13 @@
     /.well-known/assetlinks.json) intercept https://watchparty.online/join?roomId=…
     BEFORE the browser — this page never shows.
 
-    When it's NOT installed, the browser lands here and we forward straight
-    into the web app, which already joins rooms from ?roomId=.
+    When it's NOT installed, the browser lands here and we route by platform:
+      • Android  → Google Play (download the app)
+      • iPhone/iPad → App Store (download the app)
+      • Desktop (Windows/Linux/macOS) → forward into the web app, which joins
+        rooms from ?roomId= — no install needed.
+    A "Continue in browser" link stays visible so a mobile user who prefers
+    the web app can still join without installing.
   -->
   <style>
     body {
@@ -41,17 +46,57 @@
 </head>
 <body>
   <div class="spinner"></div>
-  <h1>Joining your watch party…</h1>
-  <p>If the app doesn't open, continue in the browser — no install needed.</p>
+  <h1 id="headline">Joining your watch party…</h1>
+  <p id="subline">If the app doesn't open, continue in the browser — no install needed.</p>
   <a class="btn" id="webLink" href="https://app.watchparty.online/">Continue in browser</a>
-  <a class="alt" href="https://watchparty.online/download">Get the app</a>
+  <a class="alt" id="storeLink" href="https://watchparty.online/download">Get the app</a>
   <script>
-    // Forward the invite into the web app, preserving the roomId (and any
-    // other params). Kept on a short delay so an installed app's link
-    // interception isn't raced on browsers that still load the page flash.
-    var target = "https://app.watchparty.online/" + (window.location.search || "");
-    document.getElementById("webLink").href = target;
-    setTimeout(function () { window.location.replace(target); }, 400);
+    (function () {
+      var ua = navigator.userAgent || '';
+      var params = window.location.search || '';
+      // Same UA sniff as download.html: an iPad in desktop mode reports
+      // MacIntel + touch points, so check touch before the Mac branch.
+      var plat = 'desktop';
+      if (/android/i.test(ua)) plat = 'android';
+      else if (/iphone|ipad|ipod/i.test(ua) ||
+               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) plat = 'ios';
+
+      var APPSTORE = 'https://apps.apple.com/app/id6761379322';
+      var PLAY = 'https://play.google.com/store/apps/details?id=com.autotech.watchparty';
+      var WEB = 'https://app.watchparty.online/' + params; // keeps ?roomId=…
+      var STORE_PAGE = 'https://watchparty.online/download';
+
+      var webLink = document.getElementById('webLink');
+      var storeLink = document.getElementById('storeLink');
+      webLink.href = WEB;
+
+      // Mobile + app NOT installed (we only render when interception failed):
+      // send them to their store to get the native app.
+      if (plat === 'android' || plat === 'ios') {
+        var store = plat === 'android' ? PLAY : APPSTORE;
+        document.title = 'Get WatchParty for ' + (plat === 'android' ? 'Android' : 'iOS');
+        document.getElementById('headline').textContent = 'Open WatchParty on your phone';
+        document.getElementById('subline').textContent =
+          'The app isn\u2019t installed yet — we\u2019re taking you to the store. ' +
+          'After installing, tap the invite link again to jump straight into the party.';
+        storeLink.href = store;
+        storeLink.textContent = 'Continue to ' + (plat === 'android' ? 'Google Play' : 'App Store');
+        // Keep the web fallback reachable so mobile users can still join
+        // without installing (guest mode) — no auto-redirect, they choose.
+        webLink.textContent = 'Continue in browser instead';
+        webLink.classList.add('alt');
+        // Delay the store redirect so the page's copy is visible and an
+        // installed app's link interception isn't raced.
+        setTimeout(function () { window.location.replace(store); }, 800);
+      } else {
+        // Desktop (Windows/Linux/macOS): the web app IS the product. Forward
+        // into it, preserving the roomId (and any other params). Kept on a
+        // short delay so an installed app's link interception isn't raced on
+        // browsers that still load the page flash.
+        storeLink.href = STORE_PAGE;
+        setTimeout(function () { window.location.replace(WEB); }, 400);
+      }
+    })();
   </script>
 </body>
 </html>
