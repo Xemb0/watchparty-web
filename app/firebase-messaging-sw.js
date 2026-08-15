@@ -1,6 +1,7 @@
 // firebase-messaging-sw.js
 // ───────────────────────────────────────────────────────────────────────────
-// SINGLE service worker for scope /app/. The filename "firebase-messaging-sw.js"
+// SINGLE service worker for scope /app/ (the live site serves the app from
+// the /app/ subdirectory). The filename "firebase-messaging-sw.js"
 // is load-bearing (FCM getToken auto-resolution) and must NOT change. It does
 // two things:
 //   1. Firebase Cloud Messaging background notifications (unchanged behaviour).

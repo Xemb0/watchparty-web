@@ -116,7 +116,10 @@
         // size hints keep the modal usable inside a phone-sized
         // WebView (Picker auto-falls back to a full-screen dialog
         // below a width threshold).
-        var view = new google.picker.View(google.picker.ViewId.DOCS_VIDEOS);
+        // DocsView (not the plain View) so we can ask for GRID — the default
+        // LIST mode renders filenames only, no thumbnails.
+        var view = new google.picker.DocsView(google.picker.ViewId.DOCS_VIDEOS)
+          .setMode(google.picker.DocsViewMode.GRID);
         var picker = new google.picker.PickerBuilder()
           .addView(view)
           .setOAuthToken(ACCESS_TOKEN)

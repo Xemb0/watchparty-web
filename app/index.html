@@ -32,7 +32,9 @@
     })();
     </script>
 
-    <!-- PWA: installable web app. All paths are ROOT-ABSOLUTE (/app/...) so they
+    <!-- PWA: installable web app. The live site serves this app from the
+         /app/ subdirectory (watchparty.online/app and app.watchparty.online
+         via Netlify rewrite), so all asset paths are /app/-prefixed and
          resolve correctly even on deep routes served via the SPA rewrite
          (e.g. /app/room/ABCD), where document-relative paths would 404. -->
     <link rel="manifest" href="/app/manifest.webmanifest">
@@ -199,7 +201,7 @@
     <div class="logo-box">
         <span style="font-size: 56px;">🎬</span>
     </div>
-    <h1>WatchTogether</h1>
+    <h1>WatchParty</h1>
     <p>Create unforgettable movie nights with friends,<br>no matter where you are.</p>
     <div class="btn-container">
         <button class="btn-google" id="btnGoogleSignIn">G&nbsp;&nbsp;&nbsp;Sign in with Google</button>
@@ -325,9 +327,9 @@
                     try {
                         const permission = await Notification.requestPermission();
                         if (permission !== 'granted') return '';
-                        // Pass our /app/ service worker explicitly. Without it the
-                        // SDK tries to register /firebase-messaging-sw.js at the
-                        // ROOT (404 here) and getToken fails — no web push.
+                        // Reuse our explicitly-registered service worker (the one
+                        // registered as /firebase-messaging-sw.js below) so getToken
+                        // binds to the right registration — otherwise no web push.
                         const reg = await navigator.serviceWorker.ready;
                         const token = await getToken(messaging, { vapidKey, serviceWorkerRegistration: reg });
                         return token || '';
@@ -352,11 +354,12 @@
 
 <script>
     if ('serviceWorker' in navigator) {
-        // Pin to the ABSOLUTE /app/ path + explicit scope. A document-relative
-        // path drifts on deep routes (/app/room/ABCD -> /app/room/firebase-…sw.js
-        // which the SPA rewrite answers with index.html), breaking BOTH FCM and
-        // PWA install on deep-link first loads. updateViaCache:'none' guarantees
-        // the SW script itself is always revalidated (self-update / recovery).
+        // Pin to the /app/-prefixed path + explicit scope (the live site serves
+        // the app from /app/). A document-relative path drifts on deep routes
+        // (/app/room/ABCD -> /app/room/firebase-…sw.js which the SPA rewrite
+        // answers with index.html), breaking BOTH FCM and PWA install on
+        // deep-link first loads. updateViaCache:'none' guarantees the SW script
+        // itself is always revalidated (self-update / recovery).
         navigator.serviceWorker.register('/app/firebase-messaging-sw.js', { scope: '/app/', updateViaCache: 'none' })
             .then(function(reg) { console.log('[WP] Service worker registered:', reg.scope); })
             .catch(function(err) { console.warn('[WP] SW registration failed:', err); });
@@ -404,8 +407,7 @@
                     try {
                         var view = new google.picker.DocsView(google.picker.ViewId.DOCS_VIDEOS);
                         view.setIncludeFolders(true);
-                        // setOrigin is REQUIRED when the page is served from a
-                        // sub-path (/app/) — without it the picker's postMessage
+                        // setOrigin is REQUIRED — without it the picker's postMessage
                         // callback never reaches us, so "I pick and nothing happens".
                         var picker = new google.picker.PickerBuilder()
                             .setOrigin(window.location.protocol + '//' + window.location.host)
@@ -625,16 +627,102 @@ window.__wp_setInAppAd = function () {};
         });
     }
 
-    window.__wp_lk_connect = async function(url, token) {
+    // REMOTE AUDIO PLAYBACK. livekit-client does NOT auto-create DOM audio
+    // elements — someone must call track.attach() on an <audio> element or
+    // remote voices stay silent (the app used to attach video only, so the
+    // speaking indicator lit up but no sound came out). We create one element
+    // per audio track, remember it for cleanup, and inherit the current
+    // mute-all volume so late subscribers can't blast through.
+    window.__wp_lk_audioByTrack = window.__wp_lk_audioByTrack || new Map();
+    window.__wp_lk_unlockRemoteAudio = function() {
+        if (window.__wp_lk_audioByTrack) {
+            window.__wp_lk_audioByTrack.forEach(function(el) {
+                if (el.paused) { try { el.play().catch(function() {}); } catch (e) {} }
+            });
+        }
+    };
+    if (!window.__wp_lk_audioUnlockWired) {
+        window.__wp_lk_audioUnlockWired = true;
+        // Autoplay-policy safety net: if an audio element was created before
+        // any user gesture its play() would be blocked; resume on the first
+        // real gesture. Joining already required clicks, so this is a no-op
+        // in practice — belt-and-suspenders for deep-link auto-joins.
+        document.addEventListener('pointerdown', window.__wp_lk_unlockRemoteAudio);
+        document.addEventListener('keydown', window.__wp_lk_unlockRemoteAudio);
+    }
+
+    // Poll-driven guarantee (see getParticipants): attach every remote audio
+    // track that isn't already playing. Idempotent — tracks already attached
+    // are skipped via audioByTrack.
+    window.__wp_lk_ensureRemoteAudio = function() {
+        if (!window.__wp_lk_room) return;
+        window.__wp_lk_room.remoteParticipants.forEach(function(p) {
+            p.audioTrackPublications.forEach(function(pub) {
+                if (!pub.track) return;
+                if (window.__wp_lk_audioByTrack.has(pub.track)) return;
+                try {
+                    var el = document.createElement('audio');
+                    el.autoplay = true;
+                    el.style.display = 'none';
+                    document.body.appendChild(el);
+                    pub.track.attach(el);
+                    window.__wp_lk_audioByTrack.set(pub.track, el);
+                    console.log('[WP-LK] ensure: remote audio attached (' + p.identity.slice(0, 8) + ')');
+                    if (typeof pub.track.setVolume === 'function') {
+                        try { pub.track.setVolume(window.__wp_lk_allRemoteVolume); } catch (e) {}
+                    }
+                } catch (e) { console.error('[WP-LK] ensure audio attach failed:', e); }
+            });
+        });
+    };
+
+    window.__wp_lk_connect = async function(url, token, voiceIsolation) {
         try {
-            const room = new LivekitClient.Room();
+            // Mirror mobile's connect-time voice-isolation snapshot: NS/AEC/AGC
+            // are baked into the capture constraints when the mic track is
+            // created, so the toggle applies on the next connect (the audio
+            // popup's row already says "applies on next call"). Browsers fully
+            // support these getUserMedia constraints.
+            var iso = voiceIsolation !== false;
+            const room = new LivekitClient.Room({
+                audioCaptureDefaults: {
+                    noiseSuppression: iso,
+                    echoCancellation: iso,
+                    autoGainControl: iso,
+                },
+            });
             await room.connect(url, token);
+            // Unlock the SDK's internal autoplay handling so remote audio
+            // doesn't sit in a suspended AudioContext (the user already
+            // gestured by joining — this just tells the SDK to use it).
+            try { room.startAudio(); } catch (e) { console.warn('[WP-LK] startAudio:', e && e.message); }
             window.__wp_lk_room = room;
 
             // Re-attach any pre-registered renderers whenever a track lands.
             room.on('trackSubscribed', function(track, pub, participant) {
                 if (track.kind === 'video') {
                     __wp_lk_tryAttachToBindings(participant);
+                } else if (track.kind === 'audio') {
+                    // THE web remote-audio fix: attach the track to a real
+                    // <audio> element or it stays silent (the speaking
+                    // indicator still lights — it's driven by SFU speaker
+                    // events — which is why this bug read as "indicator but
+                    // no voice").
+                    console.log('[WP-LK] trackSubscribed audio, participant=' + (participant ? participant.identity.slice(0, 8) : '?'));
+                    try {
+                        var el = document.createElement('audio');
+                        el.autoplay = true;
+                        el.style.display = 'none';
+                        document.body.appendChild(el);
+                        track.attach(el);
+                        window.__wp_lk_audioByTrack.set(track, el);
+                        console.log('[WP-LK] audio element created, muted=' + el.muted + ' volume=' + el.volume + ' paused=' + el.paused);
+                    } catch (e) { console.error('[WP-LK] remote audio attach failed:', e); }
+                    if (typeof track.setVolume === 'function') {
+                        // Late subscriptions inherit the current mute-all volume so a
+                        // peer who joins while "mute all" is on can't blast through.
+                        try { track.setVolume(window.__wp_lk_allRemoteVolume); } catch (e) {}
+                    }
                 }
             });
             room.on('localTrackPublished', function(pub, participant) {
@@ -647,6 +735,14 @@ window.__wp_setInAppAd = function () {};
             });
             room.on('trackUnsubscribed', function(track) {
                 try { track.detach(); } catch (_) {}
+                // Remove the audio element we created for this track (if any).
+                if (window.__wp_lk_audioByTrack) {
+                    var el = window.__wp_lk_audioByTrack.get(track);
+                    if (el) {
+                        window.__wp_lk_audioByTrack.delete(track);
+                        if (el.parentElement) el.parentElement.removeChild(el);
+                    }
+                }
             });
             // Stubs (polling drives state)
             room.on('participantDisconnected', () => {});
@@ -819,9 +915,65 @@ window.__wp_setInAppAd = function () {};
         }
     };
 
+    // Front/back camera flip. LiveKit JS has no switchCamera() like Android's
+    // SDK, but restartTrack() re-acquires the SAME published track with new
+    // capture constraints — no unpublish/republish, so remote subscribers keep
+    // receiving seamlessly. We track the current facingMode ourselves (LiveKit's
+    // capture default is 'user' = front).
+    window.__wp_lk_facingMode = 'user';
+    window.__wp_lk_switchCamera = async function() {
+        if (!window.__wp_lk_room) return false;
+        try {
+            var lp = window.__wp_lk_room.localParticipant;
+            var pub = lp.getTrackPublication(LivekitClient.Track.Source.Camera);
+            var track = pub && pub.track;
+            if (!track) return false; // camera not on — nothing to flip
+            var next = window.__wp_lk_facingMode === 'user' ? 'environment' : 'user';
+            await track.restartTrack({ facingMode: next });
+            window.__wp_lk_facingMode = next;
+            __wp_lk_tryAttachToBindings(lp); // re-home the restarted track into the tiles
+            return true;
+        } catch (e) {
+            // Desktop webcams usually have no 'environment' camera → OverconstrainedError.
+            // Latch like the other camera paths so Kotlin can surface the reason.
+            console.error('[WP-LK] switchCamera failed:', e);
+            window.__wp_lk_lastCameraError = (e && e.name ? e.name + ': ' : '') + (e && e.message ? e.message : 'camera switch failed');
+            throw e;
+        }
+    };
+
+    // Mute / unmute every remote participant's audio at the PLAYBACK layer —
+    // setVolume(0) keeps the streams alive (no unsubscribe churn) while
+    // silencing them locally, mirroring Android's setRemoteAudioEnabled. The
+    // volume is remembered so tracks that subscribe LATER inherit it (see the
+    // trackSubscribed handler in connect). Web uses 1.0 for "on" — the mobile
+    // comfort gain compensates a USAGE_MEDIA retag that doesn't exist here.
+    window.__wp_lk_allRemoteVolume = 1.0;
+    window.__wp_lk_setAllRemoteVolume = function(volume) {
+        window.__wp_lk_allRemoteVolume = volume;
+        if (!window.__wp_lk_room) return false;
+        try {
+            window.__wp_lk_room.remoteParticipants.forEach(function(p) {
+                p.audioTrackPublications.forEach(function(pub) {
+                    if (pub.track && typeof pub.track.setVolume === 'function') {
+                        try { pub.track.setVolume(volume); } catch (e) {}
+                    }
+                });
+            });
+            return true;
+        } catch (e) { console.error('[WP-LK] setAllRemoteVolume failed:', e); return false; }
+    };
+
     window.__wp_lk_getParticipants = function() {
         if (!window.__wp_lk_room) return '[]';
         var participants = [];
+
+        // SELF-HEALING REMOTE AUDIO: the Kotlin poll calls this every 500ms,
+        // so we use it as the backstop for trackSubscribed — any remote audio
+        // track that exists but isn't playing gets attached to an <audio>
+        // element right here, regardless of event timing (events can be lost
+        // or deferred by the autoplay policy; this cannot).
+        if (window.__wp_lk_ensureRemoteAudio) window.__wp_lk_ensureRemoteAudio();
 
         // Add local participant
         var lp = window.__wp_lk_room.localParticipant;
@@ -890,10 +1042,17 @@ window.__wp_setInAppAd = function () {};
                 window.__wp_lk_videoBindings[k].delete(videoElement);
             });
         }
-        if (videoElement.srcObject) {
-            videoElement.srcObject.getTracks().forEach(function(t) { t.stop(); });
-            videoElement.srcObject = null;
-        }
+        // Detach the RENDER ONLY — clear srcObject WITHOUT stopping the tracks.
+        // These are LiveKit's LIVE MediaStreamTracks (your local camera track,
+        // and the remote receive tracks). Calling t.stop() ENDS them
+        // irreversibly: the moment ANY tile was disposed — grid relayout at 3+
+        // participants, a camera toggle, a popup hiding the tiles — it stopped
+        // the local publish (all peers saw you go black, forever) AND the
+        // received tracks (every remote tile went black on your screen), and
+        // nothing recovered because re-mounted tiles re-attached to now-ended
+        // tracks. LiveKit owns track lifecycle (setCameraEnabled / subscribe);
+        // the render layer must NEVER stop tracks. Just drop the element's ref.
+        videoElement.srcObject = null;
     };
 </script>
 
@@ -937,10 +1096,14 @@ window.__wp_setInAppAd = function () {};
   }
 </style>
 <!-- "Get the native app" pill — links web users to the download page.
-     Absolute URL so it works on watchparty.online/app/ AND app.watchparty.online. -->
+     Absolute URL so it works regardless of which host serves the app.
+     z-index MUST beat the video-player wrap (9999, YouTubeIFramePlayer/Dailymotion)
+     and its chrome/control bar (2147483000) so the pill stays clickable WHILE a
+     video is playing; kept below the file-picker/camera/presence modals
+     (2147483600+) so those still cover it. pointer-events:auto for good measure. -->
 <a id="wpGetApp" href="https://watchparty.online/download" target="_blank" rel="noopener"
    style="position:fixed; top:max(10px, env(safe-area-inset-top)); left:50%; transform:translateX(-50%);
-          z-index:9998; display:none; align-items:center; gap:8px;
+          z-index:2147483100; pointer-events:auto; display:none; align-items:center; gap:8px;
           background:rgba(20,18,40,.85); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
           border:1px solid rgba(167,139,250,.5); color:#fff;
           font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; font-size:13px; font-weight:600;
