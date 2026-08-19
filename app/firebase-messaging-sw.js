@@ -1,7 +1,6 @@
 // firebase-messaging-sw.js
 // ───────────────────────────────────────────────────────────────────────────
-// SINGLE service worker for scope /app/ (the live site serves the app from
-// the /app/ subdirectory). The filename "firebase-messaging-sw.js"
+// SINGLE service worker for scope / (site root). The filename "firebase-messaging-sw.js"
 // is load-bearing (FCM getToken auto-resolution) and must NOT change. It does
 // two things:
 //   1. Firebase Cloud Messaging background notifications (unchanged behaviour).
@@ -30,7 +29,7 @@ const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
     const title = payload.notification?.title || 'WatchParty';
-    // Resolve against the SW scope so it works at /app/. (Was '/favicon.ico',
+    // Resolve against the SW scope so it works at the site root. (Was '/favicon.ico',
     // which 404s — there is no favicon at that path.)
     const icon = new URL('icons/icon-192.png', self.registration.scope).href;
     self.registration.showNotification(title, {

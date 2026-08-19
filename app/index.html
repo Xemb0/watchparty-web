@@ -32,20 +32,18 @@
     })();
     </script>
 
-    <!-- PWA: installable web app. The live site serves this app from the
-         /app/ subdirectory (watchparty.online/app and app.watchparty.online
-         via Netlify rewrite), so all asset paths are /app/-prefixed and
+    <!-- PWA: installable web app. All paths are ROOT-ABSOLUTE (/...) so they
          resolve correctly even on deep routes served via the SPA rewrite
-         (e.g. /app/room/ABCD), where document-relative paths would 404. -->
-    <link rel="manifest" href="/app/manifest.webmanifest">
+         (e.g. /room/ABCD), where document-relative paths would 404. -->
+    <link rel="manifest" href="/manifest.webmanifest">
     <meta name="theme-color" content="#1a1a2e">
-    <link rel="icon" type="image/png" sizes="32x32" href="/app/icons/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
     <!-- iOS Safari "Add to Home Screen" (ignores the manifest — uses these). -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="WatchParty">
-    <link rel="apple-touch-icon" sizes="180x180" href="/app/icons/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
     <style>
         html {
             margin: 0;
@@ -354,13 +352,12 @@
 
 <script>
     if ('serviceWorker' in navigator) {
-        // Pin to the /app/-prefixed path + explicit scope (the live site serves
-        // the app from /app/). A document-relative path drifts on deep routes
-        // (/app/room/ABCD -> /app/room/firebase-…sw.js which the SPA rewrite
-        // answers with index.html), breaking BOTH FCM and PWA install on
-        // deep-link first loads. updateViaCache:'none' guarantees the SW script
-        // itself is always revalidated (self-update / recovery).
-        navigator.serviceWorker.register('/app/firebase-messaging-sw.js', { scope: '/app/', updateViaCache: 'none' })
+        // Pin to the ROOT-ABSOLUTE path + explicit scope. A document-relative
+        // path drifts on deep routes (/room/ABCD -> /room/firebase-…sw.js
+        // which the SPA rewrite answers with index.html), breaking BOTH FCM and
+        // PWA install on deep-link first loads. updateViaCache:'none' guarantees
+        // the SW script itself is always revalidated (self-update / recovery).
+        navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/', updateViaCache: 'none' })
             .then(function(reg) { console.log('[WP] Service worker registered:', reg.scope); })
             .catch(function(err) { console.warn('[WP] SW registration failed:', err); });
     }
@@ -1056,7 +1053,7 @@ window.__wp_setInAppAd = function () {};
     };
 </script>
 
-<script src="/app/watchparty.js"></script>
+<script src="watchparty.js"></script>
 
 <!-- ─────────────────────────────────────────────────────────────────────────
      PWA install prompt. A dismissible bottom banner that:
@@ -1135,7 +1132,7 @@ window.__wp_setInAppAd = function () {};
 </script>
 
 <div id="wpInstallBanner">
-  <img src="/app/icons/icon-192.png" alt="WatchParty">
+  <img src="/icons/icon-192.png" alt="WatchParty">
   <div class="wp-txt">
     <div class="wp-title">Install WatchParty</div>
     <div class="wp-sub" id="wpInstallSub">Add it to your home screen for full-screen, app-like watch parties.</div>
