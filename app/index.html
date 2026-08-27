@@ -1075,6 +1075,7 @@ window.__wp_setInAppAd = function () {};
     box-shadow: 0 10px 40px rgba(0,0,0,0.5);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     color: #fff;
+    pointer-events: none;
   }
   #wpInstallBanner.show { display: flex; }
   #wpInstallBanner img { width: 44px; height: 44px; border-radius: 12px; flex: 0 0 auto; }
@@ -1091,6 +1092,7 @@ window.__wp_setInAppAd = function () {};
     flex: 0 0 auto; background: rgba(255,255,255,0.08); border: none; cursor: pointer;
     color: rgba(255,255,255,0.85); width: 28px; height: 28px; border-radius: 14px; font-size: 16px;
   }
+  #wpInstallBanner .wp-install, #wpInstallBanner .wp-close { pointer-events: auto; }
 </style>
 <!-- "Get the native app" pill — links web users to the download page.
      Absolute URL so it works regardless of which host serves the app.
