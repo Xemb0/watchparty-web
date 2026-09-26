@@ -1,10 +1,15 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "com.autotech.watchparty",
-    "sha256_cert_fingerprints": [
-      "4C:D3:F7:11:97:3B:AF:4B:A3:35:07:C3:67:00:4D:A6:F2:FC:1A:0C:28:98:E6:B9:4B:2D:FA:73:B5:60:7E:F8"
-    ]
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.autotech.watchparty",
+      "sha256_cert_fingerprints": [
+        "4C:D3:F7:11:97:3B:AF:4B:A3:35:07:C3:67:00:4D:A6:F2:FC:1A:0C:28:98:E6:B9:4B:2D:FA:73:B5:60:7E:F8",
+        "43:F1:F8:3D:2F:1C:4E:94:97:3A:70:EE:81:F8:06:4B:A0:A7:DF:3A:2F:47:E9:F1:77:94:FB:EF:13:F6:65:63"
+      ]
+    }
   }
-}]
+]

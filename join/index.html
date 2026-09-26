@@ -70,24 +70,31 @@
       var storeLink = document.getElementById('storeLink');
       webLink.href = WEB;
 
-      // Mobile + app NOT installed (we only render when interception failed):
-      // send them to their store to get the native app.
+      // A browser landing does not prove the app is absent: link verification may fail.
       if (plat === 'android' || plat === 'ios') {
         var store = plat === 'android' ? PLAY : APPSTORE;
         document.title = 'Get WatchParty for ' + (plat === 'android' ? 'Android' : 'iOS');
         document.getElementById('headline').textContent = 'Open WatchParty on your phone';
         document.getElementById('subline').textContent =
-          'The app isn\u2019t installed yet — we\u2019re taking you to the store. ' +
-          'After installing, tap the invite link again to jump straight into the party.';
+          'Open the app to join this room, or continue in your browser.';
         storeLink.href = store;
         storeLink.textContent = 'Continue to ' + (plat === 'android' ? 'Google Play' : 'App Store');
         // Keep the web fallback reachable so mobile users can still join
         // without installing (guest mode) — no auto-redirect, they choose.
         webLink.textContent = 'Continue in browser instead';
         webLink.classList.add('alt');
-        // Delay the store redirect so the page's copy is visible and an
-        // installed app's link interception isn't raced.
-        setTimeout(function () { window.location.replace(store); }, 800);
+        // Android explicit intent retains the room even before domain verification refreshes.
+        if (plat === 'android') {
+          var room = new URLSearchParams(params).get('roomId');
+          if (room && /^[a-z0-9]{4,12}$/i.test(room)) {
+            var openApp = document.createElement('a');
+            openApp.className = 'btn';
+            openApp.textContent = 'Open WatchParty';
+            openApp.href = 'intent://watchparty.online/join?roomId=' + encodeURIComponent(room) +
+              '#Intent;scheme=https;package=com.autotech.watchparty;S.browser_fallback_url=' + encodeURIComponent(WEB) + ';end';
+            webLink.parentNode.insertBefore(openApp, webLink);
+          }
+        }
       } else {
         // Desktop (Windows/Linux/macOS): the web app IS the product. Forward
         // into it, preserving the roomId (and any other params). Kept on a
